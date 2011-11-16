@@ -1,21 +1,24 @@
 $(document).ready(function() {
-	// empty div at the end if reqd
+	// empty div at the end
+	// if there are no empty items
 	var add_empty_div = function() {
 		if(!$('.wbitems .wbitem:empty').length) {
 			$('.wbitems').append('<div class="wbitem"></div>');
 		}
 	}
 
-	// select item
+	// edit item on click
+	// if already in edit state, do nothing
 	$('.wbitems').delegate('div.wbitem','click', function() {
 		if($(this).find('input').length) return;
 		
-		var txt = $(this).text().replace(/^\s*/, '').replace(/\s*$/, '');
+		var txt = $.trim($(this).text());
 		$(this).html('<input class="edit_wbitem" type="text" value="'+txt+'">')
 			.find('.edit_wbitem').focus();
 	});
 	
-	// deselect item
+	// set text on blur
+	// if text is empty, remove the item
 	$('.wbitems').delegate('input.edit_wbitem', 'blur', function() {
 		if(!$(this).val()) {
 			$(this).parent().remove();
@@ -26,4 +29,17 @@ $(document).ready(function() {
 		add_empty_div();
 	});
 	
+});
+
+// make the sidebar
+$(document).bind('session_load', function() {
+	// hide the default login button
+	//$('.topbar .nav.secondary-nav').css('display','none');
+	
+	if($.session.user=='guest') {
+		// guest must either login or register
+		$('.sidebar').html('<a href="#signin">Login</a> or \
+			<a href="#register">Register</a> to save this whiteboard');
+	}
 })
+
