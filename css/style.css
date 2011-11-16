@@ -1,0 +1,66 @@
+/*additional*/
+body {
+	color: #202020;
+	padding-top: 40px; /* for topbar */
+}
+
+textarea.code {
+	font-family: Monaco, Courier, Mono; 
+	width: 640px;
+	height: 20em;
+}
+
+.outer {
+	margin-top: 17px;
+}
+
+.content {
+	display: none;
+}
+
+.content.active {
+	display: block;
+}
+
+.sidebar {
+	padding: 7px;
+	background-color: #ddd;
+}
+
+.round {
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;	
+}
+
+.wblabel {
+	font-size: 24px;
+	padding-bottom: 17px;
+	font-family: "Delius", cursive;
+	color: blue;
+}
+
+.wbitem {
+	cursor: pointer;
+	min-height: 18px;
+	font-size: 18px;
+	padding-bottom: 11px;
+	font-family: "Delius", cursive;
+}
+
+.wbitem.small {
+	font-size: 15px;
+}
+
+.wbitem.large {
+	font-size: 21px;
+}
+
+input.edit_wbitem {
+	border: 0px;
+	font-family: "Delius", cursive;
+	width: 80%;	
+	text-align: left;
+	font-size: 18px;
+	height: 27px;
+}
