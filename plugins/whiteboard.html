@@ -1,0 +1,49 @@
+<div class="row">
+	<div class="span11">
+		<div class="wblabel">My Whiteboard</div>
+		<div class="wbitems">
+			<div class="wbitem">Welcome to the whiteboard app</div>
+			<div class="wbitem">Add items, invite people create your own whiteboard</div>
+			<div class="wbitem">Click me to edit</div>
+			<div class="wbitem"></div>
+		</div>
+	</div>
+	<div class="span5">
+		<div class="sidebar round"></div>
+	</div>
+</div>
+<script>
+$('#whiteboard').bind('_make', function() {
+	// empty div at the end
+	// if there are no empty items
+	var add_empty_div = function() {
+		if(!$('.wbitems .wbitem:empty').length) {
+			$('.wbitems').append('<div class="wbitem"></div>');
+		}
+	}
+
+	// edit item on click
+	// if already in edit state, do nothing
+	$('.wbitems').delegate('div.wbitem','click', function() {
+		if($(this).find('input').length) return;
+		
+		var txt = $.trim($(this).text());
+		$(this).html('<input class="edit_wbitem" type="text" value="'+txt+'">')
+			.find('.edit_wbitem').focus();
+	});
+	
+	// set text on blur
+	// if text is empty, remove the item
+	$('.wbitems').delegate('input.edit_wbitem', 'blur', function() {
+		if(!$(this).val()) {
+			$(this).parent().remove();
+			add_empty_div();
+			return;
+		}
+		$(this).parent().html($(this).val());
+		add_empty_div();
+	});
+	
+});
+
+</script>
