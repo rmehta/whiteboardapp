@@ -9,41 +9,259 @@
 		</div>
 	</div>
 	<div class="span5">
-		<div class="sidebar round"></div>
+		<div class="sidebar">
+			<div class="sections">
+			</div>
+			<div class="message_area">
+			</div>
+		</div>
 	</div>
 </div>
 <script>
-$('#whiteboard').bind('_make', function() {
-	// empty div at the end
-	// if there are no empty items
-	var add_empty_div = function() {
-		if(!$('.wbitems .wbitem:empty').length) {
-			$('.wbitems').append('<div class="wbitem"></div>');
-		}
-	}
 
-	// edit item on click
-	// if already in edit state, do nothing
-	$('.wbitems').delegate('div.wbitem','click', function() {
-		if($(this).find('input').length) return;
+/*
+whiteboard class
+----------------
+methods:
+	render_sidebar()
+	save()
+	load()
+	adduser()
+	removeuser()
+*/
+
+function Whiteboard() {
+	var me = this;
+	$.extend(me, {
+		// empty div at the end
+		// if there are no empty items
+		add_empty_div: function() {
+			if(!$('.wbitems .wbitem:empty').length) {
+				$('.wbitems').append('<div class="wbitem"></div>');
+			}
+		},
 		
-		var txt = $.trim($(this).text());
-		$(this).html('<input class="edit_wbitem" type="text" value="'+txt+'">')
-			.find('.edit_wbitem').focus();
-	});
-	
-	// set text on blur
-	// if text is empty, remove the item
-	$('.wbitems').delegate('input.edit_wbitem', 'blur', function() {
-		if(!$(this).val()) {
-			$(this).parent().remove();
-			add_empty_div();
-			return;
+		// add delegate events
+		// on click, make the item editable
+		// on blur, 
+		// 		make it static
+		//		if empty, remove it
+		//		add empty item (for new) if missing
+		setup: function() {
+			me.make_sidebar();
+
+			// edit item on click
+			// if already in edit state, do nothing
+			$('#whiteboard').delegate('div.wbitem, div.wblabel','click', function() {
+				if($(this).find('input').length) return;
+
+				var txt = $.trim($(this).text());
+				$(this).html('<input class="edit_wbitem" type="text" value="'+txt+'">')
+					.find('.edit_wbitem').focus();
+					
+				$(this).find('input').keydown(function(event) {
+					if(event.which==13) {
+						if($(this).parent().hasClass('wblabel')) {
+							$('#whiteboard .wbitem:first').click();							
+						} else {
+							$(this).parent().next().click();														
+						}
+					}
+				})
+			});
+
+			// set text on blur
+			// if text is empty, remove the item
+			$('#whiteboard').delegate('input.edit_wbitem', 'blur', function() {
+				if(!$(this).val()) {
+					$(this).parent().remove();
+					me.add_empty_div();
+					return;
+				}
+				$(this).parent().html($(this).val());
+				me.add_empty_div();
+			});
+			
+			$('#whiteboard .wbitems').sortable();
+			$('#whiteboard .wbitems').disableSelection();
+		},
+		
+		// extract label, name and items
+		// from the whiteboard html
+		// check if label and items are present
+		save: function() {
+			var label = $('.wblabel').text();
+			if(!label) {
+				me.set_message('Must give a name!', 'error');
+				return;
+			}
+			if($('.wbitems .wbitem').length==1) {
+				me.set_message("Can't save empty whiteboard", "error");
+				return;
+			}
+			var obj = {
+				"type":"whiteboard",
+				"owner":$.session.user,
+				"label": label,
+				"item":[]
+			}
+			
+			// new or replace?
+			obj.name = $('.wblabel').attr('name');
+			if(!obj.name) {
+				obj.name = label.replace(/[^\w\d]+/g, '_').toLowerCase();
+				obj._new = 1;
+			} else {
+				obj._replace = 1
+			}
+
+			$('.wbitems .wbitem').each(function(i, div) {
+				if($(div).text())
+					obj.item.push({"content": $(div).text()})
+			});
+			
+			$.objstore.post(obj, function(data) {
+				if(data.message && data.message == 'ok') {
+					me.set_message('Saved', "success");
+					$('#whiteboard').trigger('wbsave')
+				} else {
+					me.set_message(data.error ? data.error : 'Error');
+				}
+			});	
+		},
+
+		set_message: function(msg, type) {
+			$('.sidebar .message_area').html('<div class="alert-message block-message '
+				+(type || '')+'">'+msg+'</div>')
+				.find(".alert-message")
+				.delay(3000)
+				.fadeOut();
+		},
+		
+		// setup sidebar
+		// if user is logged in, options:
+		// 		- save
+		//		- shared with
+		//		- list of other whiteboards
+		// else as to login
+		make_sidebar : function() {
+			if(!$.session)
+				return;
+
+			$section = $('.sidebar .sections')
+				.html('<div class="sidebar_section alert-message block-message info"></div>')
+				.find('.sidebar_section');
+				
+			if($.session.user=='guest') {
+				// guest must either login or register
+				$section.html('<a href="#signin">Login</a> or \
+					<a href="#register">Register</a> to save this whiteboard');
+			} else {
+				// save
+				$section.html('<a href="#" id="save_whiteboard">Save</a> this whiteboard, \
+					or <a href="#" id="new_whiteboard">Start New</a>');
+				$('#save_whiteboard').click(function() {
+					me.save();
+					return false;
+				});
+				$('#new_whiteboard').click(function() {
+					me.clear();
+					return false;
+				});
+				
+				// make my whiteboard list
+				me.make_list()
+			}
+		},
+		
+		make_list: function() {
+			$.getJSON('lib/py/query.py', {
+				"type":"whiteboard",
+				"columns":"label, name",
+				"filters":[["owner", "=", $.session.user]],
+				"order_by":"label asc"
+				
+			}, function(data) {
+				// make a new section for whiteboard lists
+				if(!$('#wblist').length) {
+					$section = $('.sidebar .sections')
+						.append('<div id="wblist" class="sidebar_section alert-message \
+						block-message info"></div>')					
+				}
+				$('#wblist').empty();
+				
+				// render the results
+				$.each(data.result, function(i, wb) {
+					// make a new whiteboard list entry
+					$('#wblist').append($.rep('<div>\
+						<a href="#whiteboard/%(name)s">%(label)s</a>\
+						<a class="close" href="#" style="line-height: 28px;">×</a>\
+					</div>', wb));
+					
+					// delete whiteboard
+					$('#wblist .close:last').click(function() {
+						var me = this;
+						$.ajax({
+							url:'lib/py/objstore.py',
+							type:'DELETE',
+							data: {type:"whiteboard", name: me.wbname},
+							success: function(r) {
+							if(r.message=='ok')
+								$(me).parent().fadeOut();
+							},
+						});
+						return false;
+					})[0].wbname = wb.name;
+				});
+				
+				if(!data.result.length) {
+					$('#wblist').text('You are yet to save your first whiteboard!');
+				}
+			});
+		},
+		
+		clear: function() {
+			$('.wblabel').html('New Whiteboard').attr('name', '');
+			$('.wbitems').html('<div class="wbitem">Add some items</div>');
+			location.hash = 'whiteboard';		
+		},
+		
+		load: function() {
+			var route = location.hash.split('/');
+			if(route.length > 1) {
+				$('.wblabel').html('Loading "'+route[1]+'"...')
+				$('.wbitems').empty();
+				$.objstore.get("whiteboard", route[1], function(obj) {
+					$('.wblabel').html(obj.label || obj.name).attr("name", obj.name);
+					if(obj.item) {
+						$.each(obj.item, function(i, item) {
+							$('.wbitems').append('<div class="wbitem">'+item.content+'</div>');
+						});						
+					}
+					me.add_empty_div();
+				})
+			}
 		}
-		$(this).parent().html($(this).val());
-		add_empty_div();
-	});
-	
+	})
+}
+
+
+// make the sidebar
+$(document).bind('session_load', function() {
+	app.wb && app.wb.make_sidebar();
 });
 
+// render whiteboard on load
+$('#whiteboard').bind('_make', function() {
+	app.wb = new Whiteboard();	
+	app.wb.setup();
+});
+
+$('#whiteboard').bind('_show', function() {
+	app.wb.load();
+});
+
+$('#whiteboard').bind('wbsave', function() {
+	app.wb.make_list();
+});
 </script>

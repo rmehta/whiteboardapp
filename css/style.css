@@ -22,9 +22,13 @@ textarea.code {
 	display: block;
 }
 
-.sidebar {
+.sidebar_section {
 	padding: 7px;
 	background-color: #ddd;
+}
+
+.message_area {
+	margin-top: 11px;
 }
 
 .round {
