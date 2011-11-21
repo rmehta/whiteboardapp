@@ -22,12 +22,28 @@ textarea.code {
 	display: block;
 }
 
-.sidebar_section {
-	padding: 7px;
-	background-color: #ddd;
+.sidebar {
+	background-color: #ddf4fb;	
+	padding: 17px;
 }
 
-.message_area {
+.sidebar_section {
+	margin-top: 17px;
+	display: none;
+}
+
+.sidebar_section button {
+	float: right;
+}
+
+.sidebar_section .items {
+	margin-left: 11px;
+}
+.sidebar_section .items div {
+	height: 28px;
+}
+
+#message_area {
 	margin-top: 11px;
 }
 
