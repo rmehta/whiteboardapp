@@ -36,13 +36,6 @@ textarea.code {
 	float: right;
 }
 
-.sidebar_section .items {
-	margin-left: 11px;
-}
-.sidebar_section .items div {
-	height: 28px;
-}
-
 #message_area {
 	margin-top: 11px;
 }
@@ -53,7 +46,7 @@ textarea.code {
 	border-radius: 4px;	
 }
 
-.wblabel {
+#wblabel {
 	font-size: 24px;
 	padding-bottom: 17px;
 	font-family: "Delius", cursive;
@@ -66,6 +59,7 @@ textarea.code {
 	font-size: 18px;
 	padding-bottom: 11px;
 	font-family: "Delius", cursive;
+	width: 80%;
 }
 
 .wbitem.small {
@@ -83,4 +77,14 @@ input.edit_wbitem {
 	text-align: left;
 	font-size: 18px;
 	height: 27px;
+}
+
+.sidebar_section .items {
+	margin-left: 11px;
+}
+.sidebar_section .items div {
+	height: 30px;
+}
+.sidebar_section .items a.close {
+	margin-top: 5px;
 }
