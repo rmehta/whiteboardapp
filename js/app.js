@@ -1,5 +1,5 @@
 // register plugins
-$._plugins.whiteboard = {path:'plugins/'}
+$._views.whiteboard = {path:'views/'}
 $.index = 'whiteboard';
 
 $(document).ready(function() {
@@ -8,4 +8,4 @@ $(document).ready(function() {
 
 $(document).bind('logout', function() {
 	window.location.reload(1);
-})
+});

@@ -129,7 +129,7 @@ function Whiteboard() {
 					
 				$(this).find('input').keydown(function(event) {
 					if(event.which==13) {
-						if($(this).parent().hasClass('wblabel')) {
+						if($(this).parent().attr('id')=='wblabel') {
 							$('#whiteboard .wbitem:first').click();							
 						} else {
 							$(this).parent().next().click();														
