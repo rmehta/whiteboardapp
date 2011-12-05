@@ -1,7 +1,7 @@
 """
 whiteboard model
 """
-import model
+from lib.py import model
 
 class Whiteboard(model.Model):
 	_name = "whiteboard"

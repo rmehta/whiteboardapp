@@ -1,7 +1,7 @@
 """
 item model
 """
-import model
+from lib.py import model
 
 class Item(model.Model):
 	_name = "item"
