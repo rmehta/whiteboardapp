@@ -1,31 +1,26 @@
-#!/usr/bin/python
-
 """
 helper functions
 
 - get list of my whiteboards
 """
+from lib.py import database, sess, whitelist
 
-def get(**args):
-	"""get list of my whiteboards"""
-	if not 'cmd' in args:
-		return {"error":"bad request"}
-		
-	if args['cmd'] == 'my whiteboards':
-		import database, session
-		
-		if session.user=='guest':
-			return {"error":"not logged in"}
-		
-		db = database.get()
-		return {"data":db.sql("""select wb.name, wb.label
-				from whiteboard wb, whiteboarduser wbuser
-				where wbuser.user=%s and wbuser.parent = wb.name""", session.user)}
-		
-if __name__=='__main__':
-	import sys
-	sys.path.append('../lib/py')
+@whitelist
+def mywblist(**args):
+	"""get list of my whiteboards and those i am shared"""
 	
-	import http_request
-	http_request.main()
-
+	if sess['user']=='guest':
+		return {"error":"not logged in"}
+	
+	db = database.get()
+	return {'result': db.sql("""
+			select name, label from whiteboard
+			where owner = %(user)s
+			order by label asc""", sess) + \
+			db.sql("""
+			select wb.name, wb.label
+			from whiteboard wb, whiteboarduser wbuser
+			where 
+				wbuser.user=%(user)s and 
+				wbuser.parent = wb.name
+			order by wb.label asc""", sess)}

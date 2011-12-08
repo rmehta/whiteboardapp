@@ -71,7 +71,7 @@ function WhiteboardSidebar() {
 				// save
 				$section.html('<a href="#" id="save_whiteboard">Save</a> this whiteboard');
 				$('#save_whiteboard').click(function() {
-					app.wb.save();
+					app.wb.save(true);
 					return false;
 				});
 				me.wblist = new WhiteboardList(me);
@@ -181,17 +181,21 @@ function Whiteboard() {
 				"whiteboarduser":[]
 			}
 			
-			// new or replace?
-			obj.name = $('#wblabel').attr('name');
-			if(!obj.name) {
-				obj.name = $.session.user + '-' + label.replace(/[^\w\d]+/g, '_').toLowerCase();
-				obj._new = 1;
-			} else {
-				obj._replace = 1
-			}
-
 			me._add_items_and_users(obj);
 			return obj;			
+		},
+
+		// check if the item has a name,
+		// if not, set a new name and return true
+		// or return false
+		_is_new: function(obj) {
+			obj.name = $('#wblabel').attr('name');
+			if(!obj.name) {
+				var label = $('#wblabel').text();
+				obj.name = $.session.user + '-' + label.replace(/[^\w\d]+/g, '_').toLowerCase();
+				return true;
+			}
+			return false;
 		},
 		
 		_add_items_and_users: function(obj) {
@@ -208,12 +212,18 @@ function Whiteboard() {
 		// extract label, name and items
 		// from the whiteboard html
 		// check if label and items are present
-		save: function() {
+		save: function(manual) {
 			var obj = me.getobj();
-
-			$.objstore.post(obj, function(data) {
+			
+			// set name and determine action
+			action = me._is_new(obj) ? 'insert' : 'update';
+			
+			$.objstore[action](obj, function(data) {
 				if(data.message && data.message == 'ok') {
-					//app.sidebar.set_message('Saved', "success");
+					// called manually, show a response
+					if(manual) {
+						app.sidebar.set_message('Saved', "success");						
+					}
 					$('#whiteboard').trigger('wbsave');
 					$('#wblabel').attr('name', obj.name);
 				} else {
@@ -297,25 +307,22 @@ function WhiteboardList() {
 			});
 		},
 		refresh: function() {
-			$.getJSON('lib/py/query.py', {
-				"type":"whiteboard",
-				"columns":"label, name",
-				"filters":[["owner", "=", $.session.user]],
-				"order_by":"label asc"
+			$.call({
+				method: "controllers.helpers.mywblist",
+				success: function(data) {
+					// make a new section for whiteboard lists
+					$('#wb_list .items').empty();
 
-			}, function(data) {
-				// make a new section for whiteboard lists
-				$('#wb_list .items').empty();
+					// render the results
+					$.each(data.result, function(i, item) {
+						me.add_item(item)
+					});
 
-				// render the results
-				$.each(data.result, function(i, item) {
-					me.add_item(item)
-				});
-
-				if(!data.result.length) {
-					$('#wb_list .items').text('You are yet to save your first whiteboard!');
+					if(!data.result.length) {
+						$('#wb_list .items').text('You are yet to save your first whiteboard!');
+					}
 				}
-			});				
+			});
 		},
 		add_item: function(item) {
 			$('#wb_list .no_items').css('display', 'none');
