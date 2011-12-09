@@ -81,7 +81,7 @@ function WhiteboardSidebar() {
 			$('#message_area').html('<div class="alert-message block-message round '
 				+(type || '')+'">'+msg+'</div>')
 				.find(".alert-message")
-				.delay(3000)
+				.delay(type=='error' ? 7000 : 3000)
 				.fadeOut();
 		}		
 	});
@@ -227,7 +227,7 @@ function Whiteboard() {
 					$('#whiteboard').trigger('wbsave');
 					$('#wblabel').attr('name', obj.name);
 				} else {
-					app.sidebar.set_message(data.error ? data.error : 'Error');
+					app.sidebar.set_message(data.error ? data.error : 'Unknown Error', 'error');
 				}
 			});	
 		},
@@ -340,9 +340,9 @@ function WhiteboardList() {
 		},
 		
 		delete_item: function(btn) {
-			$.ajax({
-				url:'lib/py/objstore.py',
-				type:'DELETE',
+			$.call({
+				method:'lib.py.objstore.delete',
+				type:'POST',
 				data: {type:"whiteboard", name: btn.wbname},
 				success: function(r) {
 				if(r.message=='ok')

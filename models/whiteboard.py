@@ -32,15 +32,11 @@ class Whiteboard(model.Model):
 		from lib.py import common, database, sess
 		db = database.get()
 		
-		# anyone allowed to save new objects
-		if method=='post' and self.obj.get('_new') and sess['user']!='guest':
-			return
-
 		# rest only allowed if owner or shared
 		if sess['user'] == self.obj.get('owner'):
 			return
 		if sess['user'] in [a['value'] for a in \
-			db.sql("select value from whiteboarduser where parent=%s", self.obj['name'])]:
+			db.sql("select user from whiteboarduser where parent=%s", self.obj['name'])]:
 			return
 		
 		raise Exception, "This whiteboard is private"
