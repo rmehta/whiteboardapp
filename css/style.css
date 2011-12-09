@@ -22,6 +22,10 @@ textarea.code {
 	display: block;
 }
 
+/*
+	Sidebar
+*/
+
 .sidebar {
 	background-color: #ddf4fb;	
 	padding: 17px;
@@ -60,6 +64,10 @@ textarea.code {
 	color: blue;
 }
 
+/*
+	Items
+*/
+
 .wbitem {
 	cursor: pointer;
 	min-height: 18px;
@@ -68,19 +76,45 @@ textarea.code {
 	font-family: "Delius", cursive;
 }
 
-.wbitem.small {
-	font-size: 15px;
-}
-
-.wbitem.large {
-	font-size: 21px;
-}
 
 input.edit_wbitem {
 	border: 0px;
-	font-family: "Delius", cursive;
+	font-family: inherit;
+	color: inherit;
 	width: 80%;	
 	text-align: left;
 	font-size: 18px;
 	height: 27px;
+}
+
+/*
+	Pen styles
+*/
+
+.pen-font-delius {
+	font-family: "Delius", cursive;	
+}
+
+.pen-font-pacifico {
+	font-family: 'Pacifico', cursive;
+}
+
+.pen-font-rock-salt {
+	font-family: 'Rock Salt', cursive;
+}
+
+.pen-color-blue {
+	color: blue;
+}
+
+.pen-color-red {
+	color: red;
+}
+
+.pen-color-black {
+	color: black;
+}
+
+.pen-color-green {
+	color: green;
 }

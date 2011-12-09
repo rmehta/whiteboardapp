@@ -12,8 +12,8 @@ class Item(model.Model):
 		parent_type varchar(240) not null default "whiteboard",
 		idx int(10) not null,
 		content text,
-		color varchar(20) not null default "black",
-		`size` varchar(20) not null default "medium",
+		color varchar(40) not null default "black",
+		font varchar(40) not null default "delium",
 		_updated timestamp,
 		foreign key (parent) references whiteboard(name) on delete cascade,
 		unique (parent, idx)
