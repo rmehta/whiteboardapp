@@ -22,6 +22,25 @@ textarea.code {
 	display: block;
 }
 
+/* 
+	Form
+*/
+.form-footer {
+	padding: 13px;
+}
+.form-footer:before, .form-footer:after {
+  display: table;
+  content: "";
+  zoom: 1;
+}
+.form-footer:after {
+  clear: both;
+}
+.form-footer .btn {
+	float: right;
+	margin-left: 5px;
+}
+
 /*
 	Sidebar
 */
