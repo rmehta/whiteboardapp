@@ -61,6 +61,8 @@ function Whiteboard() {
 				// switch to last whiteboard, or new
 				if($.session.user=='guest') {
 					me.clear();
+				} else {
+					$.view.open('whiteboard/' + $.session.userobj.last_whiteboard);
 				}
 			});
 			
@@ -172,7 +174,6 @@ function Whiteboard() {
 			new WhiteboardItem({'content':'Click me to edit'});
 			new WhiteboardItem({'content':'Enjoy'});
 			me.new_item();
-			location.hash = 'whiteboard';		
 		},
 		
 		load: function() {

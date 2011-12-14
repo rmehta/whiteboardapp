@@ -5,7 +5,7 @@ helper functions
 """
 from lib.py import database, sess, whitelist
 
-@whitelist
+@whitelist()
 def mywblist(**args):
 	"""get list of my whiteboards and those i am shared"""
 	
@@ -24,3 +24,12 @@ def mywblist(**args):
 				wbuser.user=%(user)s and 
 				wbuser.parent = wb.name
 			order by wb.label asc""", sess)}
+
+@whitelist()
+def update_user_settings(**args):
+	"""update last_whiteboard, pen_font, pen_color"""
+	db = database.get()
+	for key in args:
+		if key not in ('name', '_method'):
+			db.setvalue('user', args['name'], key, args[key])
+		

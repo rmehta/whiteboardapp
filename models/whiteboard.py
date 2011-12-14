@@ -18,6 +18,12 @@ class Whiteboard(model.Model):
 	def __init__(self, obj):
 		self.obj = obj
 	
+	def before_get(self):
+		"""update whiteboard setting in user"""
+		from lib.py import database, sess
+		db = database.get()
+		db.setvalue('user', sess['user'], 'last_whiteboard', self.obj['name'], commit=True)
+	
 	def before_post(self):
 		"""update email of users (for gravatars)"""
 		from lib.py import database
