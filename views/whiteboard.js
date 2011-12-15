@@ -191,6 +191,7 @@ function Whiteboard() {
 									
 					// set label
 					$('#wblabel').html(obj.label || obj.name).attr("name", obj.name);
+					document.title = 'Whiteboard: ' + obj.label || obj.name;
 					
 					// set items
 					if(obj.item) {

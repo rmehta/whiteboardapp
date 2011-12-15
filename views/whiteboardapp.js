@@ -1,5 +1,5 @@
 // register plugins
-$._views.whiteboard = {
+app.views.whiteboard = {
 	path:'views/page_layout.html'
 }
 
@@ -15,16 +15,13 @@ $(document).ready(function() {
 
 });
 
-function WhiteboardApp() {
-	$.extend(this, {
-		init: function() {
-			$.require('views/whiteboardsidebar.js');
-			$.require('views/whiteboardlist.js');
-			$.require('views/whiteboard.js');
+var WhiteboardApp = Class.extend({
+	init: function() {
+		$.require('views/whiteboardsidebar.js');
+		$.require('views/whiteboardlist.js');
+		$.require('views/whiteboard.js');
 
-			app.sidebar = new WhiteboardSidebar();
-			app.wb = new Whiteboard();			
-		}
-	});
-	this.init();
-}
+		app.sidebar = new WhiteboardSidebar();
+		app.wb = new Whiteboard();			
+	}
+});

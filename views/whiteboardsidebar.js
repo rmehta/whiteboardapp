@@ -62,8 +62,8 @@ function WhiteboardSidebar() {
 						
 			if(!$.session.user || $.session.user=='guest') {
 				// guest must either login or register
-				$section.html('<a href="#signin">Login</a> or \
-					<a href="#register">Register</a> to save this whiteboard');
+				$section.html('<a href="javascript:app.login()">Login</a> or \
+					<a href="javascript:app.register()">Register</a> to save this whiteboard');
 			} else {
 				// save
 				$section.html('<a href="#" id="save_whiteboard">Save</a> this whiteboard');
