@@ -6,89 +6,17 @@ WhiteboardSidebar
 WhiteboardSidebarView = Class.extend({
 	init: function() {
 		this.make();
-		if($.session)
-			this.reset();
-		this.controller = new WhiteboardSidebarController(this);
 	},
 	make: function() {
-		$('.span5').empty().html('<div class="sidebar">\
-			<div class="sections">\
-				<div class="sidebar_section round" id="wb_login" style="margin-top: 0px">\
-				</div>\
-				<div class="sidebar_section round" id="wb_list">\
-					<button class="btn small" onclick="javascript:app.wb.new_whiteboard();">New</button>\
-					<h5>My Whiteboards</h5>\
-					<div class="items"></div>\
-					<div class="no_items help-block">None saved yet</div>\
-				</div>\
-				<div class="sidebar_section round" id="pen_style">\
-					<div>\
-					<h5>Style</h5>\
-					<table>\
-						<tr>\
-							<td style="width: 50%">\
-								<div class="clearfix">\
-									<ul class="inputs-list">\
-										<li>\
-											<label>\
-												<input type="radio" name="penfont" value="delius" />\
-												<span class="pen-font-delius">Font</span>\
-											</label>\
-										</li>\
-										<li>\
-											<label>\
-												<input type="radio" name="penfont" value="pacifico" />\
-												<span class="pen-font-pacifico">Font</span>\
-											</label>\
-										</li>\
-										<li>\
-											<label>\
-												<input type="radio" name="penfont" value="rock-salt" />\
-												<span class="pen-font-rock-salt">Font</span>\
-											</label>\
-										</li>\
-									<ul>\
-								</div>\
-							</td>\
-							<td style="width: 50%">\
-								<div class="clearfix">\
-									<ul class="inputs-list pen-color-list">\
-										<li>\
-											<label>\
-												<input type="radio" name="pencolor" value="red" />\
-												<span class="pen-color-red">Red</span>\
-											</label>\
-										</li>\
-										<li>\
-											<label>\
-												<input type="radio" name="pencolor" value="black" />\
-												<span class="pen-color-black">Black</span>\
-											</label>\
-										</li>\
-										<li>\
-											<label>\
-												<input type="radio" name="pencolor" value="green" />\
-												<span class="pen-color-green">Green</span>\
-											</label>\
-										</li>\
-									<ul>\
-								</div>\
-							</td>\
-						</tr>\
-					</table>\
-					</div>\
-				</div>\
-				<div class="sidebar_section round" id="wbuserlist">\
-					<button class="btn small">Add</button>\
-					<h5>Shared With</h5>\
-					<div class="items"></div>\
-					<div class="no_items help-block">Private</div>\
-				</div>\
-			</div>\
-			<div id="message_area">\
-		</div>');
-		$('#wb_login').css('display', 'block');
-		$('#pen_style').css('display', 'block');
+		var me = this;
+		$('.span5').empty().load('views/sidebar.html', function() {
+			$('#wb_login').css('display', 'block');
+			$('#pen_style').css('display', 'block');			
+
+			if($.session)
+				me.reset();
+			me.controller = new WhiteboardSidebarController(me);
+		});
 	},
 	show_wb_list: function(display) {
 		$('#wb_list').css('display', display ? 'block' : 'none');
