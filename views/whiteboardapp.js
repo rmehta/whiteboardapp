@@ -4,7 +4,7 @@ app.views.whiteboard = {
 }
 
 $.index = 'whiteboard';
-app.version = 1 // -1 = development mode / no files in localStorage
+app.version = 2 // -1 = development mode / no files in localStorage
 
 $(document).ready(function() {
 	// home is whiteboard

@@ -5,18 +5,13 @@ WhiteboardSidebar
 
 WhiteboardSidebarView = Class.extend({
 	init: function() {
-		this.make();
-	},
-	make: function() {
 		var me = this;
-		$('.span5').empty().load('views/sidebar.html', function() {
-			$('#wb_login').css('display', 'block');
-			$('#pen_style').css('display', 'block');			
+		$('#wb_login').css('display', 'block');
+		$('#pen_style').css('display', 'block');			
 
-			if($.session)
-				me.reset();
-			me.controller = new WhiteboardSidebarController(me);
-		});
+		if($.session)
+			me.reset();
+		me.controller = new WhiteboardSidebarController(me);
 	},
 	show_wb_list: function(display) {
 		$('#wb_list').css('display', display ? 'block' : 'none');
