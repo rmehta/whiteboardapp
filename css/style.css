@@ -22,6 +22,13 @@ textarea.code {
 	display: block;
 }
 
+.secondary-nav img.gravatar { /* gravatar */
+	margin-right: 8px; 
+	float:right; 
+	margin-top: 6px;
+}
+
+
 /* 
 	Form
 */
@@ -46,24 +53,39 @@ textarea.code {
 */
 
 .sidebar {
-	background-color: #ddf4fb;	
-	padding: 17px;
+	
 }
 
 .sidebar_section {
+	background-color: #ddf4fb;
+	padding: 11px;
 	margin-top: 17px;
 	display: none;
+}
+
+.sidebar_section h5 {
+	line-height: 1em;
+	margin-bottom: 17px;
+}
+
+.sidebar_section button.btn.small {
+	padding: 4px;
 }
 
 .sidebar_section button {
 	float: right;
 }
 
-.sidebar_section .items {
+.sidebar_section .items, li {
 	margin-left: 11px;
 }
 .sidebar_section .items div {
 	height: 28px;
+}
+
+#wb_share img.gravatar {
+	margin-right: 8px; 
+	margin-bottom: -9px;
 }
 
 #message_area {
@@ -79,7 +101,7 @@ textarea.code {
 #wblabel {
 	font-size: 24px;
 	padding-bottom: 17px;
-	font-family: "Delius", cursive;
+	font-family: "Delius", inherit;
 	color: blue;
 }
 
@@ -92,7 +114,7 @@ textarea.code {
 	min-height: 18px;
 	font-size: 18px;
 	padding-bottom: 11px;
-	font-family: "Delius", cursive;
+	font-family: "Delius", inherit;
 }
 
 
@@ -110,16 +132,20 @@ input.edit_wbitem {
 	Pen styles
 */
 
+.brand {
+	font-family: 'Delius', inherit;
+}
+
 .pen-font-delius {
-	font-family: "Delius", cursive;	
+	font-family: "Delius", inherit;	
 }
 
 .pen-font-pacifico {
-	font-family: 'Pacifico', cursive;
+	font-family: 'Pacifico', inherit;
 }
 
 .pen-font-rock-salt {
-	font-family: 'Rock Salt', cursive;
+	font-family: 'Rock Salt', inherit;
 }
 
 .pen-color-blue {

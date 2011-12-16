@@ -11,7 +11,7 @@ class User(user.User):
 		pen_color varchar(100),
 		pen_font varchar(100),
 		_updated timestamp,
-		foreign key (last_whiteboard) references whiteboard(name) on update set null
+		foreign key (last_whiteboard) references whiteboard(name) on delete set null
 	) engine=InnoDB
 	"""
 	def __init__(self, obj):

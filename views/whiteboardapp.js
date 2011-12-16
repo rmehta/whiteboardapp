@@ -21,7 +21,8 @@ var WhiteboardApp = Class.extend({
 		$.require('views/whiteboardlist.js');
 		$.require('views/whiteboard.js');
 
-		app.sidebar = new WhiteboardSidebar();
-		app.wb = new Whiteboard();			
+		app.sidebar = new WhiteboardSidebarView();
+		app.wb = new WhiteboardView();
+		app.wb.controller.set_autosave();			
 	}
 });

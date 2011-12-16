@@ -26,10 +26,12 @@ def mywblist(**args):
 			order by wb.label asc""", sess)}
 
 @whitelist()
-def update_user_settings(**args):
+def style_change(**args):
 	"""update last_whiteboard, pen_font, pen_color"""
 	db = database.get()
+	from lib.py import sess
+	
 	for key in args:
 		if key not in ('name', '_method'):
-			db.setvalue('user', args['name'], key, args[key])
+			db.setvalue('user', sess['user'], key, args[key])
 		

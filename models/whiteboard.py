@@ -24,14 +24,17 @@ class Whiteboard(model.Model):
 		db = database.get()
 		db.setvalue('user', sess['user'], 'last_whiteboard', self.obj['name'], commit=True)
 	
-	def before_post(self):
+	def before_update(self):
 		"""update email of users (for gravatars)"""
-		from lib.py import database
-				
+		from lib.py import database, out
+	
 		db = database.get()
 		for user in self.obj.get('whiteboarduser',[]):
 			if not user.get('email'):
-				user['email'] = db.sql("""select email from user where name=%s""", user.get('user'))[0]['email']
+				user['email'] = db.getvalue('user', user['user'], 'email')
+	
+	def before_insert(self):
+		self.before_update()
 	
 	def check_allow(self, method):
 		"""raise exception if user is not owner or in shared"""

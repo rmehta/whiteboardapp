@@ -2,81 +2,123 @@
 Whiteboard Item
 ---------------
 
+Usage:
+new WhiteboardItemView(item)
+
+Properties:
+color
+font
+content
+
+Style
+wb_item
+
 */
 
-function WhiteboardItem(item) {
-	// new object
-	if(!item) item = {color:app.color, font:app.font, content:''};
-	var me = this;
-	$.extend(this, {
-		init: function() {
-			if(item.islabel) {
-				// label, already there in the layout,
-				// no need to make again
-				me.$item = $('#wblabel');
-			} else {
-				if(!item.content) item.content = '';
-				$('.wbitems').append($.rep('<div \
-					class="wbitem pen-color-%(color)s pen-font-%(font)s">\
-					%(content)s</div>', item));
+var WhiteboardItemView = Class.extend({
+	init: function(item) {
+		if(!item) 
+			item = {color:app.color, font:app.font, content:''};
+			
+		this.item = item;
+		this.make();
+		this.controller = new WhiteboardItemController(this);
+	},
+	make: function() {
+		if(this.item.islabel) {
+			// label, already there in the layout,
+			// no need to make again
+			this.$item = $('#wblabel');
+		} else {
+			if(!this.item.content) this.item.content = '';
+			$('.wbitems').append($.rep('<div \
+				class="wbitem pen-color-%(color)s pen-font-%(font)s">\
+				%(content)s</div>', this.item));
 
-				me.$item = $('.wbitems .wbitem:last');				
-			}
-			me.set_events();
-		},
+			this.$item = $('.wbitems .wbitem:last');				
+		};	
+	},
+	make_editable: function() {
+		if(this.$item.find('input').length) return;
+		this.update_pen_style();
 		
-		// remove all font and color classes
-		// add the global class
-		update_style_classes: function() {
-			if(item.islabel) return;
-			
-			// remove style
-			$.each(me.$item.classList(), function(i, className) {
-				if(className.substr(0,4)=='pen-')
-					me.$item.removeClass(className)
-			});
-			
-			// add latest style
-			me.$item.addClass('pen-font-' + app.pen_font);
-			me.$item.addClass('pen-color-' + app.pen_color);			
-		},
-		set_events: function() {
-			me.$item.click(function() {
-				me.make_editable();
-			});
-		},
-		make_editable: function() {
-			if(me.$item.find('input').length) return;
-			me.update_style_classes();
-			
-			// create_input
-			var txt = $.trim(me.$item.text());
-			$(me.$item).html('<input class="edit_wbitem" type="text" value="'+txt+'">')
-				.find('.edit_wbitem').focus();
-				
-			// next item on "enter"
-			me.$item.find('input').keydown(function(event) {
-				if(event.which==13) {
-					if(item.islabel) {
-						$('#whiteboard .wbitem:first').click();							
-					} else {
-						$(this).parent().next().click();														
-					}
-				}
-			}).blur(function() {me.make_readonly(this);});
-		},
-		make_readonly: function(input) {
+		// create_input
+		var txt = $.trim(this.$item.text());
+		$(this.$item)
+			.html('<input class="edit_wbitem" type="text" value="'+txt+'">')
+			.find('.edit_wbitem')
+			.focus()
+			.select();
+		app.wb.dirty = 1;
+	},
+
+	// remove all font and color classes
+	// add the global class
+	update_pen_style: function() {
+		if(this.item.islabel) return;
+		
+		this.remove_pen_style();
+		// add latest style
+		this.$item.addClass('pen-font-' + app.pen_font);
+		this.$item.addClass('pen-color-' + app.pen_color);			
+	},
+
+	remove_pen_style: function() {
+		var me = this;
+		$.each(this.$item.classList(), function(i, className) {
+			if(className.substr(0,4)=='pen-')
+				me.$item.removeClass(className)
+		});		
+	}
+
+});
+
+var WhiteboardItemController = Class.extend({
+	init: function(view) {
+		this.view = view;
+		this.editable_on_click();
+		this.read_only_on_blur();
+		this.move_events();
+	},
+	editable_on_click: function() {
+		var me = this;
+		this.view.$item.click(function() {
+			me.view.make_editable();
+			app.wb.new_item();	
+		});		
+	},
+	read_only_on_blur: function() {
+		this.view.$item.delegate('input', 'blur', function() {
 			app.wb.dirty = 1;
 			
-			if(!$(input).val()) {
-				// blank? remove the block
-				$(input).parent().remove();
-				app.wb.new_item();
-				return;
+			// blank? remove the block
+			if(!$(this).val()) { 
+				$(this).parent().remove();
+			} else {
+				$(this).parent().html($(this).val());				
 			}
-			$(input).parent().html($(input).val());
-			app.wb.new_item();
-		}
-	});
-	me.init();
-}
+		});
+	},
+	move_events: function() {
+		var me = this;
+		this.view.$item.delegate('input', 'keydown', function(event) {
+			// up
+			if(event.which==38) {
+				if(me.view.item.islabel) {
+					$('#whiteboard .wbitem:last').click();							
+				} else {
+					$(this).parent().prev().click();														
+				}
+			}
+
+			// down
+			if(event.which==13 || event.which==40) {
+				if(me.view.item.islabel) {
+					$('#whiteboard .wbitem:first').click();							
+				} else {
+					$(this).parent().next().click();														
+				}
+			}
+		});	
+	}
+});

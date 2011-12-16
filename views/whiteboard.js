@@ -25,192 +25,219 @@ methods:
 	clear:
 */
 
-function Whiteboard() {
-	var me = this;
-	$.extend(me, {		
-		// add delegate events
-		// on click, make the item editable
-		// on blur, 
-		// 		make it static
-		//		if empty, remove it
-		//		add empty item (for new) if missing
-		init: function() {
-			// objectify label
-			new WhiteboardItem({islabel:true})
-			
-			me.set_login_logout();
-			
-			$('#whiteboard .wbitems').sortable();
-			$('#whiteboard .wbitems').disableSelection();
-
-			// render whiteboard on load
-			$('#whiteboard').bind('_make', function() {
-				setTimeout('app.wb.autosave()', 5000);
-			});
-
-			// load the whiteboard on show
-			$('#whiteboard').bind('_show', function() {
-				app.wb.load();
-			});
-			
-			me.shared = new WhiteboardUser();
-		},
-		
-		set_login_logout: function() {
-			$(document).bind('login', function() {
-				// switch to last whiteboard, or new
-				if($.session.user=='guest') {
-					me.clear();
-				} else {
-					$.view.open('whiteboard/' + $.session.userobj.last_whiteboard);
-				}
-			});
-			
-			$(document).bind('logout', function() {
-				me.clear();
-			});
-		},
-
-		// empty div at the end
-		// if there are no empty items
-		new_item: function() {
-			if(!$('.wbitems .wbitem:empty').length) {
-				new WhiteboardItem();
-			}
-		},
-				
-		// extract the obj from the view
-		getobj: function() {
-			var label = $('#wblabel').text();
-			if(!label) {
-				app.sidebar.set_message('Must give a name!', 'error');
-				return;
-			}
-			if($('.wbitems .wbitem').length==1) {
-				app.sidebar.set_message("Can't save empty whiteboard", "error");
-				return;
-			}
-			var obj = {
-				"type":"whiteboard",
-				"owner":$.session.user,
-				"label": label,
-				"item":[],
-				"whiteboarduser":[]
-			}
-			
-			me.append_items_and_users(obj);
-			return obj;			
-		},
-
-		// check if the item has a name,
-		// if not, set a new name and return true
-		// or return false
-		isnew: function(obj) {
-			obj.name = $('#wblabel').attr('name');
-			if(!obj.name) {
-				var label = $('#wblabel').text();
-				obj.name = $.session.user + '-' + label.replace(/[^\w\d]+/g, '_').toLowerCase();
-				return true;
-			}
-			return false;
-		},
-				
-		append_items_and_users: function(obj) {
-			$('.wbitems .wbitem').each(function(i, div) {
-				if($(div).text()) {
-					$item = $(div);
-					classList = $item.classList();
-					var item = {
-						content: $.trim($item.text()),
-						color: $.get_item_beginning_with(classList, 'pen-color').substr(10),
-						font: $.get_item_beginning_with(classList, 'pen-font').substr(9)
-					};
-					if(item.content)
-						obj.item.push(item);					
-				}
-			});
-			$('#wb_share .wb_user').each(function(i, div) {
-				if($(div).text())
-					obj.whiteboarduser.push({"user": $.trim($(div).text())})
-			});				
-		},
-		
-		// extract label, name and items
-		// from the whiteboard html
-		// check if label and items are present
-		save: function(manual) {
-			if($.session.user=='guest') return;
-			var obj = me.getobj();
-			
-			// set name and determine action
-			action = me.isnew(obj) ? 'insert' : 'update';
-			
-			$.objstore[action](obj, function(data) {
-				if(data.message && data.message == 'ok') {
-					// called manually, show a response
-					if(manual) {
-						app.sidebar.set_message('Saved', "success");						
-					}
-					$('#whiteboard').trigger('wbsave');
-					$('#wblabel').attr('name', obj.name);
-				} else {
-					app.sidebar.set_message(data.error ? data.error : 'Unknown Error', 'error');
-				}
-			});	
-		},
-		
-		autosave: function() {
-			if(me.dirty) {
-				me.save();
-				me.dirty = false;
-			}
-			setTimeout('app.wb.autosave()', 5000);
-		},
-		
-		clear: function() {
-			$('#wblabel').html('New Whiteboard').attr('name', '');
-			$('.wbitems').empty();
-			new WhiteboardItem({'content':'Welcome to the whiteboard app'});
-			new WhiteboardItem({'content':'Click me to edit'});
-			new WhiteboardItem({'content':'Enjoy'});
-			me.new_item();
-		},
-		
-		load: function() {
-			$('#wb_shared').css('display', 'none');
-			var route = location.hash.split('/');
-			if(route.length > 1) {
-				$('#wblabel').html('Loading "'+route[1]+'"...')
-				$('.wbitems').empty();
-				$.objstore.get("whiteboard", route[1], function(obj) {
-					if(!obj.name) {
-						app.wb.clear();
-						app.sidebar.set_message('Whiteboard does not exist', 'error')						
-						return;
-					}	
-									
-					// set label
-					$('#wblabel').html(obj.label || obj.name).attr("name", obj.name);
-					document.title = 'Whiteboard: ' + obj.label || obj.name;
-					
-					// set items
-					if(obj.item) {
-						$.each(obj.item, function(i, item) {
-							new WhiteboardItem(item)
-						});						
-					}
-					
-					// the empty line (new)
-					me.new_item();
-					
-					// shared with
-					me.shared.refresh(obj.whiteboarduser);
-				}, function(response) {
-					app.wb.clear();
-					app.sidebar.set_message('Whiteboard was private', 'error')
-				})
-			}
+var WhiteboardView = Class.extend({
+	init: function() {
+		this.labelview = new WhiteboardItemView({islabel:true});
+		this.userlist = new WhiteboardUserListView();
+		this.controller = new WhiteboardController(this);
+		this.make_list_sortable();
+	},
+	make_list_sortable: function() {
+		$('#whiteboard .wbitems').sortable();
+		$('#whiteboard .wbitems').disableSelection();		
+	},
+	reset: function() {
+		this.label('New Whiteboard');
+		this.name('');
+		$('.wbitems').empty();
+	},
+	new_whiteboard: function() {
+		this.reset();
+		new WhiteboardItemView({'content':'Welcome to the whiteboard app'});
+		new WhiteboardItemView({'content':'Click me to edit'});
+		new WhiteboardItemView({'content':'Enjoy'});
+		this.new_item();		
+	},
+	// addempty item at the end of the list (if reqd)
+	new_item: function() {
+		if(!$('.wbitems .wbitem:empty').length) {
+			new WhiteboardItemView();
 		}
-	})
-	me.init();
-}
+	},
+	label: function(txt) {
+		return $('#wblabel').text(txt);
+	},
+	name: function(txt) {
+		return $('#wblabel').attr('name', txt);
+	}
+});
+
+
+// Controller
+var WhiteboardController = Class.extend({
+	init: function(view) {
+		this.view = view;
+		this.model = new WhiteboardModel(view, this);
+		this.load_model();
+		this.user_change();
+	},
+	load_model: function() {
+		var me = this;
+		$('#whiteboard').bind('_show', function() {
+			me.load();
+		})
+	},
+	user_change: function() {
+		var me = this;
+		$(document).bind('login', function() {
+			// switch to last whiteboard, or new
+			if($.session.user=='guest') {
+				me.view.new_whiteboard();
+			} else {
+				me.set_user_defaults();
+			}
+		});
+		
+		$(document).bind('logout', function() {
+			me.view.new_whiteboard();
+			$.view.open('whiteboard');
+		});
+	},
+	set_user_defaults: function() {
+		var user = $.session.userobj;
+		if(user.pen_font) {
+			$('input[name="penfont"][value="'+user.pen_font+'"]').click();			
+		}
+		if(user.pen_color) {
+			$('input[name="pencolor"][value="'+user.pen_color+'"]').click();
+		}
+		if(user.last_whiteboard) {
+			$.view.open('whiteboard/' + user.last_whiteboard);			
+		}
+	},
+	load: function() {
+		var route = location.hash.split('/');
+		var me = this;
+		
+		if(route.length > 1) {
+			$('#wblabel').html('Loading "'+route[1]+'"...')
+			$('.wbitems').empty();
+			$.objstore.get("whiteboard", route[1], function(obj) {
+				if(!obj.name) {
+					app.sidebar.set_message('Whiteboard does not exist', 'error')						
+					return;
+				}
+				me.render_view(obj);
+			}, function(response) {
+				app.wb.reset();
+				app.sidebar.set_message('Whiteboard was private', 'error')
+			})
+		}
+	},
+	render_view: function(obj) {
+		this.view.reset();
+		app.cur_wb = obj;
+		
+		this.set_title(obj);
+		this.set_items(obj);
+		this.view.userlist.controller.refresh(obj.whiteboarduser);
+	},
+	set_title: function(obj) {
+		// set label
+		this.view.label(obj.label || obj.name);
+		this.view.name(obj.name)
+		document.title = 'Whiteboard: ' + obj.label || obj.name;		
+	},
+	set_items: function(obj) {
+		$.each(obj.item || [], function(i, item) {
+			new WhiteboardItemView(item)
+		});
+		
+		// the empty line (new)
+		this.view.new_item();		
+	},
+	save: function(manual) {
+		if($.session.user=='guest') return;
+		var obj = this.model.get();
+		var me = this;
+		
+		// set name and determine action
+		action = this.model.isnew(obj) ? 'insert' : 'update';
+		
+		$.objstore[action](obj, function(data) {
+			if(data.message && data.message == 'ok') {
+				if(manual) {
+					// called manually, show a response
+					app.sidebar.set_message('Saved', "success");						
+				}
+				$('#whiteboard').trigger('wbsave');
+				me.view.name(obj.name)
+			} else {
+				app.sidebar.set_message(data.error || 'Unknown Error', 'error');
+			}
+		});	
+	},
+	autosave: function() {
+		if(this.view.dirty) {
+			this.save(false);
+			this.view.dirty = false;
+		}
+		this.set_autosave();
+	},
+	set_autosave: function() {
+		setTimeout('app.wb.controller.autosave()', 5000);		
+	}
+});
+
+
+// model
+var WhiteboardModel = Class.extend({
+	init: function(view, controller) {
+		this.view = view;
+		this.controller = controller;
+	},
+	// extract the obj from the view
+	get: function() {
+		if(!this.check_if_okay()) return;
+		var obj = {
+			"type":"whiteboard",
+			"owner":$.session.user,
+			"label": this.view.label(),
+			"item":[],
+			"whiteboarduser":[]
+		}
+		this.get_items(obj);
+		this.get_users(obj)
+		return obj;			
+	},
+	check_if_okay: function() {
+		var label = this.view.label();
+		if(!label) {
+			app.sidebar.set_message('Must give a name!', 'error');
+			return;
+		}
+		if($('.wbitems .wbitem').length==1) {
+			app.sidebar.set_message("Can't save empty whiteboard", "error");
+			return;
+		}
+		return true;
+	},
+	isnew: function(obj) {
+		obj.name = this.view.name();
+		if(!obj.name) {
+			var label = this.view.label();
+			obj.name = $.session.user + '-' + label.replace(/[^\w\d]+/g, '_').toLowerCase();
+			return true;
+		}
+		return false;
+	},
+	get_items: function(obj) {
+		$('.wbitems .wbitem').each(function(i, div) {
+			$item = $(div);
+			classList = $item.classList();
+			var item = {
+				content: $.trim($item.text()),
+				color: $.get_item_beginning_with(classList, 'pen-color').substr(10),
+				font: $.get_item_beginning_with(classList, 'pen-font').substr(9)
+			};
+			if(item.content)
+				obj.item.push(item);					
+		});		
+	},
+	get_users: function(obj) {
+		$('#wbuserlist .wb_user').each(function(i, div) {
+			if($(div).text())
+				obj.whiteboarduser.push({"user": $.trim($(div).text())})
+		});				
+	}
+});
