@@ -5,6 +5,9 @@ request startup script
 if core models are overriden, they can be remove from lib.py.core_models here
 """
 
+# app url
+app_url = 'http://whiteboardapp.net/'
+
 # list models (for update)
 models = [
 	'user',

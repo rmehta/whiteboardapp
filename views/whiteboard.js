@@ -50,6 +50,7 @@ var WhiteboardView = Class.extend({
 	},
 	// addempty item at the end of the list (if reqd)
 	new_item: function() {
+		console.log(1);
 		if(!$('.wbitems .wbitem:empty').length) {
 			new WhiteboardItemView();
 		}
@@ -95,11 +96,8 @@ var WhiteboardController = Class.extend({
 	},
 	set_user_defaults: function() {
 		var user = $.session.userobj;
-		if(user.pen_font) {
-			$('input[name="penfont"][value="'+user.pen_font+'"]').click();			
-		}
 		if(user.pen_color) {
-			$('input[name="pencolor"][value="'+user.pen_color+'"]').click();
+			$('.color-selector[data-color="'+user.pen_color+'"]').click();
 		}
 		if(user.last_whiteboard) {
 			$.view.open('whiteboard/' + user.last_whiteboard);			

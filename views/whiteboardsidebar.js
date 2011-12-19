@@ -53,42 +53,25 @@ var WhiteboardSidebarController = Class.extend({
 		});
 		this.style_change();
 	},
-	style_change: function() {		
-		// bind (update user)
-		$('input[name="pencolor"]').change(function() {
-			var val = $('input[name="pencolor"]:checked').val();
-			if(app.pen_color == val) return;
-			app.pen_color = val;
+	style_change: function() {	
+		$('.color-selector').click(function() {
+			$('.color-selector.selected').removeClass('selected');
+			$(this).addClass('selected');
+
+			var new_color = $(this).attr('data-color');
+			if(app.pen_color==new_color) return;
+			app.pen_color = new_color;
+
 			$.call({
 				method:'controllers.helpers.style_change',
 				type: 'POST',
 				data: {pen_color:app.pen_color}
 			});
-		});
-
-		$('input[name="penfont"]').change(function() {
-			var val = $('input[name="penfont"]:checked').val();
 			
-			// set font in color
-			$('#pen_style .pen-color-list span')
-				.removeClass('pen-font-delius')
-				.removeClass('pen-font-rock-salt')
-				.removeClass('pen-font-pacifico')
-
-			$('#pen_style .pen-color-list span').addClass('pen-font-' + val)
-
-			if(app.pen_font == val) return;
-			app.pen_font = val;
-			$.call({
-				method:'controllers.helpers.style_change',
-				type: 'POST',
-				data: {pen_font:app.pen_font}
-			});
-		});
-
+		})
+		
 		// set
-		$('input[name="pencolor"][value="'+app.pen_color+'"]').click();
-		$('input[name="penfont"][value="'+app.pen_font+'"]').click();
+		$('.color-selector[data-color="'+app.pen_color+'"]').click();
 	}
 	
 });

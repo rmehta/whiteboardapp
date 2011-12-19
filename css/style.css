@@ -92,6 +92,42 @@ textarea.code {
 	margin-top: 11px;
 }
 
+/* color selector */
+
+div#pen_style {
+	height: 25px;
+}
+
+span.color-selector {
+	display: inline-block;
+	width: 17px;
+	height: 17px;
+	margin-left: 17px;
+	border: 4px solid #ddf4fb;
+	float: left;
+	cursor: pointer;
+}
+
+span.color-selector.selected {
+	border: 4px solid #aaa;
+}
+
+span.color-selector.green {
+	background-color: green;
+}
+
+span.color-selector.black {
+	background-color: black;
+}
+
+span.color-selector.blue {
+	background-color: blue;
+}
+
+span.color-selector.red {
+	background-color: red;
+}
+
 .round {
 	-webkit-border-radius: 4px;
 	-moz-border-radius: 4px;
@@ -138,14 +174,6 @@ input.edit_wbitem {
 
 .pen-font-delius {
 	font-family: "Delius", inherit;	
-}
-
-.pen-font-pacifico {
-	font-family: 'Pacifico', inherit;
-}
-
-.pen-font-rock-salt {
-	font-family: 'Rock Salt', inherit;
 }
 
 .pen-color-blue {

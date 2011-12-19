@@ -1,3 +1,5 @@
 .DS_Store
 *.pyc
-py/conf.py
+conf/mailsettings.py
+conf/dbsettings.py
+conf/uwsgi.xml
