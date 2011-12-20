@@ -50,7 +50,6 @@ var WhiteboardView = Class.extend({
 	},
 	// addempty item at the end of the list (if reqd)
 	new_item: function() {
-		console.log(1);
 		if(!$('.wbitems .wbitem:empty').length) {
 			new WhiteboardItemView();
 		}
@@ -220,17 +219,25 @@ var WhiteboardModel = Class.extend({
 		return false;
 	},
 	get_items: function(obj) {
+		var me = this;
 		$('.wbitems .wbitem').each(function(i, div) {
 			$item = $(div);
 			classList = $item.classList();
 			var item = {
-				content: $.trim($item.text()),
+				content: me.get_item_content($item),
 				color: $.get_item_beginning_with(classList, 'pen-color').substr(10),
 				font: $.get_item_beginning_with(classList, 'pen-font').substr(9)
 			};
 			if(item.content)
 				obj.item.push(item);					
 		});		
+	},
+	get_item_content: function($item) {
+		if($item.find('input').length) {
+			return $item.find('input').val(); // editing
+		} else {
+			return $.trim($item.text()); // finished editing
+		}	
 	},
 	get_users: function(obj) {
 		$('#wbuserlist .wb_user').each(function(i, div) {

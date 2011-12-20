@@ -1,4 +1,4 @@
-from lib.py.core import user
+from lib.models import user
 
 class User(user.User):
 	_create_table = """
@@ -7,6 +7,7 @@ class User(user.User):
 		fullname varchar(240),
 		email varchar(180),
 		password varchar(100),
+		reset_password_id varchar(100),
 		last_whiteboard varchar(100),
 		pen_color varchar(100),
 		pen_font varchar(100),

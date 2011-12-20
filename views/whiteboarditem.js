@@ -88,15 +88,14 @@ var WhiteboardItemController = Class.extend({
 		});		
 	},
 	read_only_on_blur: function() {
-		this.view.$item.delegate('input', 'blur', function() {
-			app.wb.dirty = 1;
-			
+		this.view.$item.delegate('input', 'blur', function() {			
 			// blank? remove the block
 			if(!$(this).val()) { 
 				$(this).parent().remove();
 			} else {
 				$(this).parent().html($(this).val());				
 			}
+			app.wb.dirty = 1;			
 		});
 	},
 	move_events: function() {
