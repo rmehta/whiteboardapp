@@ -33,9 +33,14 @@ var WhiteboardUserListView = Class.extend({
 		// hide "no_items"
 		$('#wbuserlist .no_items').css('display', 'none');
 		
+		obj.label = obj.user;
+		if(obj.user==$.session.user) {
+			obj.label = obj.user + ' (me)';
+		}
+		
 		// add item
 		$('#wbuserlist .items').append($.rep('<div>'+img+
-			'<span class="wb_user">%(user)s</span>\
+			'<span class="wb_user" data-user="%(user)s">%(label)s</span>\
 			<a class="close" href="#">×</a></div>', obj));
 	},
 	remove_user: function(ele) {

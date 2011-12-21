@@ -44,7 +44,7 @@ class Whiteboard(model.Model):
 		# rest only allowed if owner or shared
 		if sess['user'] == self.obj.get('owner'):
 			return
-		if sess['user'] in [a['value'] for a in \
+		if sess['user'] in [a['user'] for a in \
 			db.sql("select user from whiteboarduser where parent=%s", self.obj['name'])]:
 			return
 		

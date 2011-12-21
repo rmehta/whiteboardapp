@@ -7,7 +7,6 @@ Demo application for chaiproject
 1. WSGI based web server (I use nginx/uwsgi)
 2. Python
 3. MySQL
-4. Python libraries (requests, webob)
 
 ### Setup
 

@@ -60,7 +60,11 @@ var WhiteboardListView = Class.extend({
 			type:'POST',
 			data: {type:"whiteboard", name: btn.wbname},
 			success: function(r) {
-			if(r.message=='ok')
+			if(r.message=='ok')				
+				// if on deleted, go back
+				if(app.cur_wb.name == btn.wbname)
+					$.view.open('whiteboard/' + (app.last_wb_name || $.session.userobj.last_whiteboard))
+
 				$(btn).parent().fadeOut();
 			},
 		});

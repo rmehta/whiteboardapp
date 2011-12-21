@@ -94,12 +94,14 @@ var WhiteboardController = Class.extend({
 		});
 	},
 	set_user_defaults: function() {
-		var user = $.session.userobj;
-		if(user.pen_color) {
-			$('.color-selector[data-color="'+user.pen_color+'"]').click();
+		if($.session.userobj.pen_color) {
+			$('.color-selector[data-color="'+ $.session.userobj.pen_color+'"]').click();
 		}
-		if(user.last_whiteboard) {
-			$.view.open('whiteboard/' + user.last_whiteboard);			
+		this.open_last();
+	},
+	open_last: function() {
+		if($.session.userobj.last_whiteboard) {
+			$.view.open('#whiteboard/' + $.session.userobj.last_whiteboard);			
 		}
 	},
 	load: function() {
@@ -114,6 +116,7 @@ var WhiteboardController = Class.extend({
 					app.sidebar.set_message('Whiteboard does not exist', 'error')						
 					return;
 				}
+				$.session.userobj.last_whiteboard = obj.name;
 				me.render_view(obj);
 			}, function(response) {
 				app.wb.reset();
@@ -123,6 +126,7 @@ var WhiteboardController = Class.extend({
 	},
 	render_view: function(obj) {
 		this.view.reset();
+		app.last_wb_name = app.cur_wb ? app.cur_wb.name : null;
 		app.cur_wb = obj;
 		
 		this.set_title(obj);
@@ -146,6 +150,7 @@ var WhiteboardController = Class.extend({
 	save: function(manual) {
 		if($.session.user=='guest') return;
 		var obj = this.model.get();
+		if(!obj) return;
 		var me = this;
 		
 		// set name and determine action
@@ -200,7 +205,7 @@ var WhiteboardModel = Class.extend({
 	check_if_okay: function() {
 		var label = this.view.label();
 		if(!label) {
-			app.sidebar.set_message('Must give a name!', 'error');
+			//app.sidebar.set_message('Must give a name!', 'error');
 			return;
 		}
 		if($('.wbitems .wbitem').length==1) {
@@ -241,8 +246,8 @@ var WhiteboardModel = Class.extend({
 	},
 	get_users: function(obj) {
 		$('#wbuserlist .wb_user').each(function(i, div) {
-			if($(div).text())
-				obj.whiteboarduser.push({"user": $.trim($(div).text())})
-		});				
+			if($(div).attr('data-user'))
+				obj.whiteboarduser.push({"user": $.trim($(div).attr('data-user'))})
+		});
 	}
 });
