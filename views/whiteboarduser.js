@@ -80,7 +80,7 @@ var WhiteboardUserListController = Class.extend({
 		// this will be saved along with
 		var me = this;
 		$('#wblist').delegate('a.close', 'click', function() {
-			app.wb.dirty = true;
+			app.wb.controller.dirty(true);
 			me.view.remove_user(this);
 			return false;
 		})
@@ -126,7 +126,7 @@ var WhiteboardAddUserModalView = FormModalView.extend({
 			return;
 		}
 		app.wb.userlist.add_user(obj);
-		app.wb.dirty = 1;
+		app.wb.controller.dirty(true);
 		this.$modal.modal('hide');
 	}
 })

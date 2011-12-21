@@ -172,13 +172,21 @@ var WhiteboardController = Class.extend({
 	autosave: function() {
 		if(this.view.dirty) {
 			this.save(false);
-			this.view.dirty = false;
+			this.dirty(false);
 		}
 		this.set_autosave();
 	},
 	set_autosave: function() {
 		setTimeout('app.wb.controller.autosave()', 5000);		
-	}
+	},
+	dirty: function(status) {
+		app.wb.dirty = status;
+		if(status) {
+			$('#wb_login').removeClass('info').addClass('warning');
+		} else {
+			$('#wb_login').addClass('info').removeClass('warning');			
+		}
+	},
 });
 
 

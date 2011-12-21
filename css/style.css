@@ -37,30 +37,23 @@ textarea.code {
 	
 }
 
-.sidebar_section {
-	background-color: #ddf4fb;
-	padding: 11px;
-	margin-top: 17px;
-	display: none;
-}
-
-.sidebar_section h5 {
+.alert-message.block-message h5 {
 	line-height: 1em;
 	margin-bottom: 17px;
 }
 
-.sidebar_section button.btn.small {
+.alert-message.block-message button.btn.small {
 	padding: 4px;
 }
 
-.sidebar_section button {
+.alert-message.block-message button {
 	float: right;
 }
 
-.sidebar_section .items, li {
+.alert-message.block-message .items, li {
 	margin-left: 11px;
 }
-.sidebar_section .items div {
+.alert-message.block-message .items div {
 	height: 28px;
 }
 

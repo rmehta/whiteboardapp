@@ -49,7 +49,7 @@ var WhiteboardItemView = Class.extend({
 			.find('.edit_wbitem')
 			.focus()
 			.select();
-		app.wb.dirty = 1;
+		app.wb.controller.dirty(true);
 	},
 
 	// remove all font and color classes
@@ -84,7 +84,8 @@ var WhiteboardItemController = Class.extend({
 		var me = this;
 		this.view.$item.click(function() {
 			me.view.make_editable();
-			app.wb.new_item();	
+			app.wb.new_item();
+			app.wb.controller.dirty(true);
 		});		
 	},
 	read_only_on_blur: function() {
@@ -95,7 +96,7 @@ var WhiteboardItemController = Class.extend({
 			} else {
 				$(this).parent().html($(this).val());				
 			}
-			app.wb.dirty = 1;			
+			app.wb.controller.dirty(true);
 		});
 	},
 	move_events: function() {
