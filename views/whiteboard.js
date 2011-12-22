@@ -204,7 +204,6 @@ var WhiteboardModel = Class.extend({
 	// extract the obj from the view
 	get: function() {
 		if(!this.check_if_okay()) return;
-		if($.)
 		var obj = {
 			"type":"whiteboard",
 			"owner": this.view.owner(),
