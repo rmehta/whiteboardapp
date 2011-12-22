@@ -85,7 +85,6 @@ var WhiteboardItemController = Class.extend({
 		this.view.$item.click(function() {
 			me.view.make_editable();
 			app.wb.new_item();
-			app.wb.controller.dirty(true);
 		});		
 	},
 	read_only_on_blur: function() {

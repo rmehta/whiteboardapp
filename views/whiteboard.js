@@ -39,6 +39,7 @@ var WhiteboardView = Class.extend({
 	reset: function() {
 		this.label('New Whiteboard');
 		this.name('');
+		this.owner($.session.user);
 		$('.wbitems').empty();
 	},
 	new_whiteboard: function() {
@@ -59,6 +60,9 @@ var WhiteboardView = Class.extend({
 	},
 	name: function(txt) {
 		return $('#wblabel').attr('name', txt);
+	},
+	owner: function(txt) {
+		return $('#wblabel').attr('data-owner', txt);
 	}
 });
 
@@ -136,7 +140,8 @@ var WhiteboardController = Class.extend({
 	set_title: function(obj) {
 		// set label
 		this.view.label(obj.label || obj.name);
-		this.view.name(obj.name)
+		this.view.name(obj.name);
+		this.view.owner(obj.owner);
 		document.title = 'Whiteboard: ' + obj.label || obj.name;		
 	},
 	set_items: function(obj) {
@@ -199,9 +204,10 @@ var WhiteboardModel = Class.extend({
 	// extract the obj from the view
 	get: function() {
 		if(!this.check_if_okay()) return;
+		if($.)
 		var obj = {
 			"type":"whiteboard",
-			"owner":$.session.user,
+			"owner": this.view.owner(),
 			"label": this.view.label(),
 			"item":[],
 			"whiteboarduser":[]
