@@ -1,7 +1,7 @@
 """
 whiteboard model
 """
-from lib.py import model
+from lib.chai import model
 
 class Whiteboard(model.Model):
 	_name = "whiteboard"
@@ -20,15 +20,13 @@ class Whiteboard(model.Model):
 	
 	def before_get(self):
 		"""update whiteboard setting in user"""
-		from lib.py import database, sess
-		db = database.get()
+		from lib.chai import db, sess
 		db.setvalue('user', sess['user'], 'last_whiteboard', self.obj['name'], commit=True)
 	
 	def before_update(self):
 		"""update email of users (for gravatars)"""
-		from lib.py import database, out
+		from lib.chai import db, out
 	
-		db = database.get()
 		for user in self.obj.get('whiteboarduser',[]):
 			if not user.get('email'):
 				user['email'] = db.getvalue('user', user['user'], 'email')
@@ -38,8 +36,7 @@ class Whiteboard(model.Model):
 	
 	def check_allow(self, method):
 		"""raise exception if user is not owner or in shared"""
-		from lib.py import common, database, sess
-		db = database.get()
+		from lib.chai import common, db, sess
 		
 		# rest only allowed if owner or shared
 		if sess['user'] == self.obj.get('owner'):

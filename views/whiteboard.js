@@ -1,5 +1,5 @@
-$.require('views/whiteboarditem.js');
-$.require('views/whiteboarduser.js');
+$.require('whiteboardapp/views/whiteboarditem.js');
+$.require('whiteboardapp/views/whiteboarduser.js');
 
 // from a `list` of strings,
 // returns the first item beginning with the given `txt`

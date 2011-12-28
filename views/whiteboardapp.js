@@ -1,10 +1,11 @@
 // register plugins
 app.views.whiteboard = {
-	path:'views/page_layout.html'
+	path:'whiteboardapp/views/page_layout.html'
 }
 
 $.index = 'whiteboard';
 app.version = -1 // -1 = development mode / no files in localStorage
+app.title = 'Whiteboard App';
 
 $(document).ready(function() {
 	// home is whiteboard
@@ -17,9 +18,9 @@ $(document).ready(function() {
 
 var WhiteboardApp = Class.extend({
 	init: function() {
-		$.require('views/whiteboardsidebar.js');
-		$.require('views/whiteboardlist.js');
-		$.require('views/whiteboard.js');
+		$.require('whiteboardapp/views/whiteboardsidebar.js');
+		$.require('whiteboardapp/views/whiteboardlist.js');
+		$.require('whiteboardapp/views/whiteboard.js');
 
 		app.sidebar = new WhiteboardSidebarView();
 		app.wb = new WhiteboardView();

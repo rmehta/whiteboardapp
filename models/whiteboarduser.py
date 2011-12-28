@@ -1,7 +1,7 @@
 """
 whiteboarduser model
 """
-from lib.py import model
+from lib.chai import model
 
 class WhiteboardUser(model.Model):
 	_name = "whiteboarduser"

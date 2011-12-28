@@ -3,17 +3,16 @@ helper functions
 
 - get list of my whiteboards
 """
-from lib.py import database, whitelist
+from lib.chai import db, whitelist
 
 @whitelist()
 def mywblist(**args):
 	"""get list of my whiteboards and those i am shared"""
-	from lib.py import sess
+	from lib.chai import sess
 	
 	if sess['user']=='guest':
 		return {"error":"not logged in"}
 	
-	db = database.get()
 	return {'result': db.sql("""
 			select name, label from whiteboard
 			where owner = %(user)s
@@ -29,8 +28,7 @@ def mywblist(**args):
 @whitelist()
 def style_change(**args):
 	"""update last_whiteboard, pen_font, pen_color"""
-	db = database.get()
-	from lib.py import sess
+	from lib.chai import sess
 	
 	for key in args:
 		if key not in ('name', '_method'):

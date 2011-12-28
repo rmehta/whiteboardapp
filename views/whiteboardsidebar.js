@@ -63,7 +63,7 @@ var WhiteboardSidebarController = Class.extend({
 			app.pen_color = new_color;
 
 			$.call({
-				method:'controllers.helpers.style_change',
+				method:'whiteboardapp.controllers.helpers.style_change',
 				type: 'POST',
 				data: {pen_color:app.pen_color}
 			});

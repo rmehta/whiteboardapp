@@ -7,7 +7,7 @@
 		<meta name="author" content="">
 
 		<link rel="stylesheet" href="lib/css/bootstrap.css" type="text/css"/>
-		<link rel="stylesheet" href="css/style.css" type="text/css"/>
+		<link rel="stylesheet" href="whiteboardapp/css/style.css" type="text/css"/>
 		<link href='http://fonts.googleapis.com/css?family=Delius|Pacifico|Rock+Salt' 
 			rel='stylesheet' type='text/css'>
 
@@ -18,26 +18,12 @@
  		<script type="text/javascript" src="lib/js/history.min.js"></script>
  		<script type="text/javascript" src="lib/js/core.js"></script>
  		<script type="text/javascript" src="lib/views/toolbar.js"></script>
- 		<script type="text/javascript" src="views/whiteboardapp.js"></script>
- 		<script type="text/javascript">$.app_name = "Whiteboard App"</script>
+ 		<script type="text/javascript" src="whiteboardapp/views/whiteboardapp.js"></script>
 	</head>
 	<body>
-		<div class="topbar">
-			<div class="topbar-inner">
-				<div class="container">
-					<a class="brand" href="#index">Whiteboard App</a>
-					<ul class="nav">
-					</ul>
-					<ul class="nav secondary-nav">
-					</ul>
-				</div>
-			</div>
-		</div>		
-		<div class="outer shadow round">
-			<div class="main container">
-			</div>
-		</div>
-		<div class="footer">
+		<header></header>
+		<div class="main container">
+			%(content)s
 		</div>
 	</body>
 </html>

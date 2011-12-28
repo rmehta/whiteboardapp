@@ -1,7 +1,7 @@
 """
 item model
 """
-from lib.py import model
+from lib.chai import model
 
 class Item(model.Model):
 	_name = "item"

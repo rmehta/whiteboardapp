@@ -23,7 +23,7 @@ var WhiteboardListView = Class.extend({
 	refresh: function() {
 		var me = this;
 		$.call({
-			method: "controllers.helpers.mywblist",
+			method: "whiteboardapp.controllers.helpers.mywblist",
 			success: function(data) {
 				if(!data.result.length) return;
 				

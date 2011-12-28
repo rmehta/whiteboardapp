@@ -3,22 +3,22 @@ import sys
 
 class TestWhiteboard(unittest.TestCase):
 	def setUp(self):
-		import lib.py.tests
-		lib.py.tests.register()
-		lib.py.tests.login()
+		import lib.chai.tests
+		lib.chai.tests.register()
+		lib.chai.tests.login()
 	
 	def tearDown(self):
-		from lib.py import objstore
-		import lib.py.tests
+		from lib.chai import objstore
+		import lib.chai.tests
 
 		objstore.delete(type='whiteboard', name='test')
-		lib.py.tests.cleanup()
+		lib.chai.tests.cleanup()
 		
 	def test_post(self):
-		from lib.py.tests import xcall
+		from lib.chai.tests import xcall
 		import json
 		
-		res = xcall('lib.py.objstore.post', {"obj":json.dumps({
+		res = xcall('lib.chai.objstore.post', {"obj":json.dumps({
 			'type':'whiteboard',
 			'name':'test',
 			'label':'Test',
