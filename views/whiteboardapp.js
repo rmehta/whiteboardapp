@@ -5,7 +5,7 @@ app.views.whiteboard = {
 
 $.index = 'whiteboard';
 app.version = -1 // -1 = development mode / no files in localStorage
-app.title = 'Whiteboard App';
+app.brand = 'Whiteboard App';
 
 $(document).ready(function() {
 	// home is whiteboard

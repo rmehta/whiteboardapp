@@ -4,30 +4,6 @@ body {
 	padding-top: 60px; /* for topbar */
 }
 
-textarea.code {
-	font-family: Monaco, Courier, Mono; 
-	width: 640px;
-	height: 20em;
-}
-
-.content {
-	display: none;
-}
-
-.content.active {
-	display: block;
-}
-
-.secondary-nav img.gravatar { /* gravatar */
-	margin-right: 8px; 
-	float:right; 
-	margin-top: 6px;
-}
-
-
-/*
-	Sidebar
-*/
 
 .sidebar {
 	
