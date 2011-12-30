@@ -1,31 +1,25 @@
 /*additional*/
-body {
-	color: #202020;
-	padding-top: 60px; /* for topbar */
+.sidebar-section {
+	margin-bottom: 17px;
 }
 
-
-.sidebar {
-	
-}
-
-.alert-message.block-message h5 {
+.sidebar-section h5 {
 	line-height: 1em;
 	margin-bottom: 17px;
 }
 
-.alert-message.block-message button.btn.small {
+.sidebar-section button.btn.small {
 	padding: 4px;
 }
 
-.alert-message.block-message button {
+.sidebar-section button {
 	float: right;
 }
 
-.alert-message.block-message .items, li {
+.sidebar-section .items, li {
 	margin-left: 11px;
 }
-.alert-message.block-message .items div {
+.sidebar-section .items div {
 	height: 28px;
 }
 

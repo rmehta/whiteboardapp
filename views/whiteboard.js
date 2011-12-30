@@ -94,7 +94,7 @@ var WhiteboardController = Class.extend({
 		
 		$(document).bind('logout', function() {
 			me.view.new_whiteboard();
-			$.view.open('whiteboard');
+			chai.view.open('whiteboard');
 		});
 	},
 	set_user_defaults: function() {
@@ -105,7 +105,7 @@ var WhiteboardController = Class.extend({
 	},
 	open_last: function() {
 		if($.session.userobj.last_whiteboard) {
-			$.view.open('#whiteboard/' + $.session.userobj.last_whiteboard);			
+			chai.view.open('#whiteboard/' + $.session.userobj.last_whiteboard);			
 		}
 	},
 	load: function() {
@@ -115,7 +115,7 @@ var WhiteboardController = Class.extend({
 		if(route.length > 1) {
 			$('#wblabel').html('Loading "'+route[1]+'"...')
 			$('.wbitems').empty();
-			$.objstore.get("whiteboard", route[1], function(obj) {
+			chai.objstore.get("whiteboard", route[1], function(obj) {
 				if(!obj.name) {
 					app.sidebar.set_message('Whiteboard does not exist', 'error')						
 					return;
@@ -161,7 +161,7 @@ var WhiteboardController = Class.extend({
 		// set name and determine action
 		action = this.model.isnew(obj) ? 'insert' : 'update';
 		
-		$.objstore[action](obj, function(data) {
+		chai.objstore[action](obj, function(data) {
 			if(data.message && data.message == 'ok') {
 				if(manual) {
 					// called manually, show a response

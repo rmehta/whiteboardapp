@@ -735,6 +735,7 @@ _uiHash:function(a){var b=a||this;return{helper:b.helper,placeholder:b.placehold
  */
 (function($,e,b){var c="hashchange",h=document,f,g=$.event.special,i=h.documentMode,d="on"+c in e&&(i===b||i>7);function a(j){j=j||location.href;return"#"+j.replace(/^[^#]*#?(.*)$/,"$1")}$.fn[c]=function(j){return j?this.bind(c,j):this.trigger(c)};$.fn[c].delay=50;g[c]=$.extend(g[c],{setup:function(){if(d){return false}$(f.start)},teardown:function(){if(d){return false}$(f.stop)}});f=(function(){var j={},p,m=a(),k=function(q){return q},l=k,o=k;j.start=function(){p||n()};j.stop=function(){p&&clearTimeout(p);p=b};function n(){var r=a(),q=o(m);if(r!==m){l(m=r,q);$(e).trigger(c)}else{if(q!==m){location.href=location.href.replace(/#.*/,"")+q}}p=setTimeout(n,$.fn[c].delay)}$.browser.msie&&!d&&(function(){var q,r;j.start=function(){if(!q){r=$.fn[c].src;r=r&&r+a();q=$('<iframe tabindex="-1" title="empty"/>').hide().one("load",function(){r||l(a());n()}).attr("src",r||"javascript:0").insertAfter("body")[0].contentWindow;h.onpropertychange=function(){try{if(event.propertyName==="title"){q.document.title=h.title}}catch(s){}}}};j.stop=k;o=function(){return a(q.location.href)};l=function(v,s){var u=q.document,t=$.fn[c].domain;if(v!==s){u.title=h.title;u.open();t&&u.write('<script>document.domain="'+t+'"<\/script>');u.close();q.location.hash=v}}})();return j})()})(jQuery,this);
 
+
 /*
 Misc views
 */
@@ -764,8 +765,7 @@ Misc views
 		// clear after 5sec
 		setTimeout('$("#notify'+$.notify_cnt+'").fadeOut()', 5000);
 		return $n;
-	}
-
+	};
 
 	// show a message
 	$.msgprint = function(txt) {
@@ -792,7 +792,7 @@ Misc views
 		$('#app_msgprint .modal-body').append('<p>'+txt+'</p>');
 		$('#app_msgprint').modal({backdrop:'static', show: true});
 
-	}
+	};
 
 	$.confirm = function(txt, yes, no) {
 		$.require('lib/js/bootstrap/bootstrap-modal.js');
@@ -823,13 +823,9 @@ Misc views
 		}
 		$('#app_confirm .modal-body').html('<p>'+txt+'</p>');
 		$('#app_confirm').modal({backdrop: 'static', show: true});
-	}	
+	};	
 })(jQuery);
-/* core.js
-
-Core Functions
-==============
-
+/*
 
 Utility
 -------
@@ -859,75 +855,8 @@ $.call({
 	
 })
 
-
-Inheritence "Class"
--------------------
-see: http://ejohn.org/blog/simple-javascript-inheritance/
-To subclass, use:
-
-	var MyClass = Class.extend({
-		init: function
-	})
-
-
-Require
--------
-Load js/css files (sub-modules)
-
-Usage:
-
-$.require("path/to/library")
-
-LocalStorage:
-- This method tries to save modules once loaded to localStorage. 
-- The versioning is maintained using `app.version` global property.
-- If app.version is different from localStorage._version OR app.version = -1,
-  then the localStorage will be cleared on load
-
-
-Object Store (model persistence)
---------------------------------
-
-Usage:
-
-$.objstore.insert(obj, <function: callback>)
-$.objstore.update(obj, <function: callback>)
-$.objstore.get(<type>, <name>, <function: callback>) - if not available locally, get from server
-
-$.objstore.data - double dict of all objects loaded in session via $.objstore.get
-
-
-View Management
----------------
-
-Manages opening of "Pages" via location.hash (url fragment). Pages can be changed by
-changing location.hash or calling:
-
-$.view.open('page/param')
-
-
-Application
------------
-
-Application methods
-
-app.register() - open register modal
-app.login() - fires login modal
-app.logout()
-app.editprofile() - edit profile view
-
-Setup/internal methods:
-
-These are called at startup $(document).ready
-
-app.load_session() - load session info
-app.setup_localstorage() - clear localstorage if version is changed or -1
-app.delegate_hardlinks() - create a delegate on click events on link <a> objects
-app.open_default_page() - open default page on load / fire necessary events
-
 */
 
-// utility functions
 (function($) {
 	// python style string replace
 	$.index = 'index';
@@ -985,6 +914,77 @@ app.open_default_page() - open default page on load / fire necessary events
 		});
 	}
 })(jQuery);
+/*
+
+Require
+-------
+Load js/css files (sub-modules). Inspired by http://plugins.jquery.com/project/require
+
+Usage:
+
+$.require("path/to/library")
+
+LocalStorage:
+- This method tries to save modules once loaded to localStorage. 
+- The versioning is maintained using `app.version` global property.
+- If app.version is different from localStorage._version OR app.version = -1,
+  then the localStorage will be cleared on load
+
+
+
+*/
+
+(function($) {
+	$.require = function(file, params) {
+		var extn = file.split('.').slice(-1);
+		if(!params) params = {};
+		
+		// get from localstorage if exists
+		if(localStorage && localStorage[file]) {
+			extn == 'js' && $.set_js(localStorage[file]) || $.set_css(localStorage[file]);
+			$._require_loaded[file] = true;
+			return $;
+		}
+		
+		if (!$._require_loaded[file]) {
+			$('.notification').remove();
+			var $n = $.notify('Loading...');
+			xhr = $.ajax({
+				type: "GET",
+				url: file,
+				data: {v:$.random(100)},
+				success: params.callback || null,
+				dataType: extn=="js" ? "script" : "text",
+				cache: params.cache===false?false:true,
+				async: false
+			});
+			$n && $n.remove();
+			$._require_loaded[file] = true;
+			
+			// js loaded automatically
+			if(extn=="css") {
+				$.set_css(xhr.responseText);
+			}
+			
+			// add to localStorage
+			if(localStorage) localStorage[file] = xhr.responseText;
+		}
+		return $;
+	};
+	$._require_loaded = {};
+})(jQuery);
+/*
+
+Inheritence "Class"
+-------------------
+see: http://ejohn.org/blog/simple-javascript-inheritance/
+To subclass, use:
+
+	var MyClass = Class.extend({
+		init: function
+	})
+
+*/
 
 /* Simple JavaScript Inheritance
  * By John Resig http://ejohn.org/
@@ -1051,60 +1051,44 @@ app.open_default_page() - open default page on load / fire necessary events
 	};
 })();
 
-// $.require
-// http://plugins.jquery.com/project/require
-(function($) {
-	$.require = function(file, params) {
-		var extn = file.split('.').slice(-1);
-		if(!params) params = {};
-		
-		// get from localstorage if exists
-		if(localStorage && localStorage[file]) {
-			extn == 'js' && $.set_js(localStorage[file]) || $.set_css(localStorage[file]);
-			$._require_loaded[file] = true;
-			return $;
+chai = {}
+chai.provide = function(namespace) {
+	var nsl = namespace.split('.');
+	var l = nsl.length;
+	var parent = window;
+	for(var i=0; i<l; i++) {
+		var n = nsl[i];
+		if(!parent[n]) {
+			parent[n] = {}
 		}
-		
-		if (!$._require_loaded[file]) {
-			$('.notification').remove();
-			var $n = $.notify('Loading...');
-			xhr = $.ajax({
-				type: "GET",
-				url: file,
-				data: {v:$.random(100)},
-				success: params.callback || null,
-				dataType: extn=="js" ? "script" : "text",
-				cache: params.cache===false?false:true,
-				async: false
-			});
-			$n && $n.remove();
-			$._require_loaded[file] = true;
-			
-			// js loaded automatically
-			if(extn=="css") {
-				$.set_css(xhr.responseText);
-			}
-			
-			// add to localStorage
-			if(localStorage) localStorage[file] = xhr.responseText;
-		}
-		return $;
-	};
-	$._require_loaded = {};
-})(jQuery);
+		parent = parent[n];
+	}
+}
+/*
 
+Object Store (model persistence)
+--------------------------------
 
-// object store wrapper
-$.objstore = {
+Usage:
+
+chai.objstore.insert(obj, <function: callback>)
+chai.objstore.update(obj, <function: callback>)
+chai.objstore.get(<type>, <name>, <function: callback>) - if not available locally, get from server
+
+chai.objstore.data - double dict of all objects loaded in session via chai.objstore.get
+
+*/
+
+chai.objstore = {
 	data: {},
 	set: function(obj) {
-		var d = $.objstore.data;
+		var d = chai.objstore.data;
 		if(!d[obj.type])
 			d[obj.type] = {}
 		d[obj.type][obj.name] = obj;
 	},
 	get:function(type, name, success, error) {
-		var d = $.objstore.data;
+		var d = chai.objstore.data;
 		if(d[type] && d[type][name]) {
 			success(d[type][name]);
 		} else {
@@ -1116,7 +1100,7 @@ $.objstore = {
 						error(obj); 
 						return;
 					} else {
-						$.objstore.set(obj);
+						chai.objstore.set(obj);
 						success(obj);					
 					}
 				}
@@ -1124,10 +1108,10 @@ $.objstore = {
 		}
 	},
 	insert: function(obj, success) {
-		$.objstore.post(obj, success, 'insert');
+		chai.objstore.post(obj, success, 'insert');
 	},
 	update: function(obj, success) {
-		$.objstore.post(obj, success, 'update');
+		chai.objstore.post(obj, success, 'update');
 	},
 	post: function(obj, success, insert_or_update) {
 		$.call({
@@ -1136,122 +1120,38 @@ $.objstore = {
 			data: {obj: JSON.stringify(obj)},
 			success: function(data) {
 				if(data.message && data.message=='ok') {
-					$.objstore.set(obj);
+					chai.objstore.set(obj);
 				}
 				success(data);
 			}
 		});	
 	},
 	clear: function(type, name) {
-		var d = $.objstore.data;
+		var d = chai.objstore.data;
 		if(d[type] && d[type][name])
 			delete d[type][name];
 	}
 }
 
+/*
+Application
+-----------
 
-// view management
-$.view = {
-	pages: {},
-	// sets location.hash
-	open: function(route) {
-		if(!route) return;
-		if(route[0]!='#') route = '#' + route;
-		window.location = route;
-	},
-	// shows view from location.hash
-	show_location_hash: function() {
-		var route = location.hash;
-		if(route=='#') return;
-		var viewid = $.view.get_view_id(route);		
+app.register() - open register modal
+app.login() - fires login modal
+app.logout()
+app.editprofile() - edit profile view
 
-		// go to home if not "index"
-		if(viewid=='index' && $.index!='index') {
-			$.view.open($.index);
-			return;
-		}
-		if(route==$.view.current_route) {
-			// no change
-			return;
-		}
-		$.view.current_route = location.hash;
-		
-		var viewinfo = app.views[viewid] || {};
-		$.view.show(viewid, viewinfo.path);
-	},	
-	show: function(name, path) {
-		$.view.load(name, path, function() {
-			// make page active
-			if($("#"+name).length) {
-				if($(".main.container .content#" + name).length) {
-					$(".main.container .content.active").removeClass('active');
-					$("#"+name).addClass('active');					
-				}
-			}
-			$("#"+name).trigger('_show');
-			window.scroll(0, 0);
-		});
-	},
-	load: function(name, path, callback) {
-		if(!$('#'+name).length) {
-			if(path) 
-				$.view.load_files(name, path, callback);
-			else
-				$.view.load_virtual(name, callback);
-		}
-		callback();
-	},
-	load_files: function(name, path, callback) {
-		var extn = path.split('.').splice(-1)[0];
-		if(extn=='js') {
-			$.getScript(path, callback);
-		} else {
-			$.get(path, function(html) {
-				$.view.make_page({name:name, html:html});
-				callback();
-			});
-		}
-	},
-	load_virtual: function(name, callback) {
-		$.call({
-			method: 'lib.chai.cms.page.content',
-			data: {
-				name: name,
-			},
-			success: function(data) {
-				$.view.make_page({name:name, html:data.html, virtual:true});
-				callback();
-			}
-		});
-	},
-	make_page: function(obj) {
-		$.require('lib/views/page.js');
-		new PageView(obj);
-	},
+Setup/internal methods:
 
-	// get view id from the given route
-	// route may have sub-routes separated
-	// by `/`
-	// e.g. "editpage/mypage"
-	get_view_id: function(txt) {
-		if(txt[0]=='#') { txt = txt.substr(1); }
-		if(txt[0]=='!') { txt = txt.substr(1); }
-		txt = txt.split('/')[0];
-		if(!txt) txt = $.index || 'index';
-		return txt;		
-	},
-	
-	is_same: function(name) {
-		if(name[0]!='#') name = '#' + name;
-		return name==location.hash;
-	},
-}
+These are called at startup $(document).ready
 
-// bind history change to open
-$(window).bind('hashchange', function() {
-	$.view.show_location_hash(decodeURIComponent(location.hash));
-});
+app.load_session() - load session info
+app.setup_localstorage() - clear localstorage if version is changed or -1
+app.delegate_hardlinks() - create a delegate on click events on link <a> objects
+app.open_default_page() - open default page on load / fire necessary events
 
+*/
 
 // app namespace for app globals
 var app = {	
@@ -1310,7 +1210,7 @@ var app = {
 	},
 	// open default page
 	open_default_page: function() {
-		$content = $('.main.container .content.active');
+		$content = $('#main .content-wrap.active');
 		if(location.hash && location.hash != '#') {
 			// remove the current content - may overlap
 			$content.remove();
@@ -1321,7 +1221,7 @@ var app = {
 				if(app.views[cid]) {
 					// loading a view by default
 					$content.remove();
-					$.view.open(cid);
+					chai.view.open(cid);
 				} else {
 					// active content is already loaded, 
 					// (for static content)
@@ -1329,7 +1229,7 @@ var app = {
 				}
 			} else {
 				// no location, open index
-				$.view.open($.index);
+				chai.view.open($.index);
 			}
 		}
 	},
@@ -1342,24 +1242,11 @@ var app = {
 				$(document).trigger('login');
 			}
 		})		
+	},
+	setup_cms: function() {
+		
 	}
 };
-
-app.views = {
-	'notfound': {path: 'lib/views/notfound.html'},
-	'editpage': {path: 'lib/views/editpage.html'},
-	'pagelist': {path: 'lib/views/pagelist.html'},
-	'filelist': {path: 'lib/views/filelist.html'},
-	
-	// user
-	'register': {path: 'lib/views/user/register.js'},
-	'userlist': {path: 'lib/views/user/userlist.html'},
-	'reset_password': {path: 'lib/views/user/reset_password.html'},
-	'reset_password_done': {path: 'lib/views/user/reset_password_done.html'},
-	'forgot_password': {path: 'lib/views/user/forgot_password.html'},
-	'forgot_password_done': {path: 'lib/views/user/forgot_password_done.html'}
-}
-
 
 // STARTUP!
 $(document).ready(function() {	
@@ -1374,7 +1261,139 @@ $(document).ready(function() {
 
 	// open default page
 	app.open_default_page();
+	
+	// setup cms settings
+	app.setup_cms();
 });
+/*
+View Management
+---------------
+
+Manages opening of "Pages" via location.hash (url fragment). Pages can be changed by
+changing location.hash or calling:
+
+chai.view.open('page/param')
+*/
+
+
+chai.view = {
+	pages: {},
+	// sets location.hash
+	open: function(route) {
+		if(!route) return;
+		if(route[0]!='#') route = '#' + route;
+		window.location = route;
+	},
+	// shows view from location.hash
+	show_location_hash: function() {
+		var route = location.hash;
+		if(route=='#') return;
+		var viewid = chai.view.get_view_id(route);		
+
+		// go to home if not "index"
+		if(viewid=='index' && $.index!='index') {
+			chai.view.open($.index);
+			return;
+		}
+		if(route==chai.view.current_route) {
+			// no change
+			return;
+		}
+		chai.view.current_route = location.hash;
+		
+		var viewinfo = app.views[viewid] || {};
+		chai.view.show(viewid, viewinfo.path);
+	},	
+	show: function(name, path) {
+		chai.view.load(name, path, function() {
+			// make page active
+			if($("#main .content-wrap.active").length) {
+				$("#main .content-wrap.active").removeClass('active');
+			}
+			$("#"+name).addClass('active').trigger('_show');
+			window.scroll(0, 0);
+		});
+	},
+	load: function(name, path, callback) {
+		if(!$('#'+name).length) {
+			if(path) 
+				chai.view.load_files(name, path, callback);
+			else
+				chai.view.load_virtual(name, callback);
+		}
+		callback();
+	},
+	load_files: function(name, path, callback) {
+		var extn = path.split('.').splice(-1)[0];
+		if(extn=='js') {
+			$.getScript(path, callback);
+		} else {
+			$.get(path, function(html) {
+				chai.view.make_page({name:name, html:html});
+				callback();
+			});
+		}
+	},
+	load_virtual: function(name, callback) {
+		$.call({
+			method: 'lib.chai.cms.page.content',
+			data: {
+				name: name,
+			},
+			success: function(data) {
+				chai.view.make_page({name:name, html:data.html, virtual:true});
+				callback();
+			}
+		});
+	},
+	make_page: function(obj) {
+		$.require('lib/views/ui/page.js');
+		new PageView(obj);
+	},
+
+	// get view id from the given route
+	// route may have sub-routes separated
+	// by `/`
+	// e.g. "editpage/mypage"
+	get_view_id: function(txt) {
+		if(txt[0]=='#') { txt = txt.substr(1); }
+		if(txt[0]=='!') { txt = txt.substr(1); }
+		txt = txt.split('/')[0];
+		if(!txt) txt = $.index || 'index';
+		return txt;		
+	},
+	
+	is_same: function(name) {
+		if(name[0]!='#') name = '#' + name;
+		return name==location.hash;
+	},
+}
+
+// shortcut
+chai.open = chai.view.open;
+
+// bind history change to open
+$(window).bind('hashchange', function() {
+	chai.view.show_location_hash(decodeURIComponent(location.hash));
+});
+
+app.views = {
+	'notfound': {path: 'lib/views/notfound.html'},
+	
+	// cms
+	'editpage': {path: 'lib/views/cms/editpage.html'},
+	'pagelist': {path: 'lib/views/cms/pagelist.html'},
+	'filelist': {path: 'lib/views/cms/filelist.html'},
+	'cms_settings': {path: 'lib/views/cms/settings.html'},
+	
+	// user
+	'register': {path: 'lib/views/user/register.js'},
+	'userlist': {path: 'lib/views/user/userlist.html'},
+	'reset_password': {path: 'lib/views/user/reset_password.html'},
+	'reset_password_done': {path: 'lib/views/user/reset_password_done.html'},
+	'forgot_password': {path: 'lib/views/user/forgot_password.html'},
+	'forgot_password_done': {path: 'lib/views/user/forgot_password_done.html'}
+}
 
 var TopBar = Class.extend({
 	init: function() {
@@ -1409,9 +1428,6 @@ var TopBar = Class.extend({
 	make: function() {
 		var user = ($.session && $.session.user) || 'guest';
 
-		// set brand
-		$('.topbar .brand').html(app.brand);
-
 		// clear out if there is anything
 		$('.topbar .nav.secondary-nav').empty();
 
@@ -1440,6 +1456,7 @@ var TopBar = Class.extend({
 				<li class="dropdown">\
 					<a class="dropdown-toggle" href="#">Admin</a>\
 					<ul class="dropdown-menu">\
+						<li><a href="#cms_settings">Settings</a></li>\
 						<li><a href="#pagelist">Pages</a></li>\
 						<li><a href="#filelist">Files</a></li>\
 						<li><a href="#userlist">Users</a></li>\
@@ -1481,6 +1498,10 @@ var TopBar = Class.extend({
 $(document).ready(function() {
 	$.require('lib/js/bootstrap/bootstrap-dropdown.js');
 	app.topbar = new TopBar();
+
+	// set brand
+	if(app.cms_settings.brand)
+		$('.topbar .brand').html(app.cms_settings.brand);
 })
 
 

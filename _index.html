@@ -9,11 +9,44 @@
 		<link rel="stylesheet" href="whiteboardapp/all.css" type="text/css"/>
 		<link href='http://fonts.googleapis.com/css?family=Delius' rel='stylesheet' type='text/css'>
 		<script type="text/javascript" src="whiteboardapp/all.js"></script>
+		<script type="text/javascript">%(bootjs)s</script>
 	</head>
 	<body>
 		<header></header>
-		<div class="main container">
-			%(content)s
+		<div class="container">
+			<div class="row">
+				<div class="span12" id="main">
+					%(content)s
+				</div>
+				<div class="span4">
+					<div class="sidebar">
+						<div class="sections">
+							<div class="sidebar-section" id="wb_login" style="margin-top: 0px">
+							</div>
+							<div class="sidebar-section" id="wb_list">
+								<button class="btn small" onclick="javascript:app.wb.new_whiteboard();">New</button>
+								<h5>My Whiteboards</h5>
+								<div class="items"></div>
+								<div class="no_items help-block">None saved yet</div>
+							</div>
+							<div class="sidebar-section" id="pen_style">
+								<span class="green color-selector selected" data-color="green"></span>
+								<span class="black color-selector" data-color="black"></span>
+								<span class="red color-selector" data-color="red"></span>
+								<span class="blue color-selector" data-color="blue"></span>
+							</div>
+							<div class="sidebar-section" id="wbuserlist">
+								<button class="btn small">Add</button>
+								<h5>Shared With</h5>
+								<div class="items"></div>
+								<div class="no_items help-block">Private</div>
+							</div>
+						</div>
+						<div id="message_area">
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 	</body>
 </html>

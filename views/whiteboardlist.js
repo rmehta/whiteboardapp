@@ -63,7 +63,7 @@ var WhiteboardListView = Class.extend({
 			if(r.message=='ok')				
 				// if on deleted, go back
 				if(app.cur_wb.name == btn.wbname)
-					$.view.open('whiteboard/' + (app.last_wb_name || $.session.userobj.last_whiteboard))
+					chai.view.open('whiteboard/' + (app.last_wb_name || $.session.userobj.last_whiteboard))
 
 				$(btn).parent().fadeOut();
 			},
