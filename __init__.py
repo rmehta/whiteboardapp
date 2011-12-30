@@ -5,7 +5,7 @@ concat = {
 		'lib/js/jquery/jquery.ui.core.js',
 		'lib/js/jquery/jquery.ui.sortable.js',
 		'lib/js/history.min.js',
-		'lib/js/chai/chai.js',
+		'lib/chaijs/core/core.js',
 		'whiteboardapp/views/whiteboardapp.js'
 	],
 	'all.css': [

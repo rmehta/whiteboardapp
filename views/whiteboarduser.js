@@ -98,7 +98,7 @@ var WhiteboardUserListController = Class.extend({
 
 
 // Add user Modal
-$.require('lib/views/form/modal.js');
+$.require('lib/chaijs/form/modal.js');
 var WhiteboardAddUserModalView = FormModalView.extend({
 	init: function() {
 		this._super({

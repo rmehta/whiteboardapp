@@ -1157,7 +1157,7 @@ app.open_default_page() - open default page on load / fire necessary events
 var app = {	
 	// module views
 	login: function() {
-		$.require('lib/views/user/login.js');
+		$.require('lib/chaijs/user/login.js');
 		if(!app.loginview)
 			app.loginview = new LoginView();
 		app.loginview.show();
@@ -1173,13 +1173,13 @@ var app = {
 		});
 	},
 	register: function() {
-		$.require('lib/views/user/register.js');
+		$.require('lib/chaijs/user/register.js');
 		if(!app.registerview)
 			app.registerview = new RegisterView();
 		app.registerview.show();		
 	},
 	editprofile: function() {
-		$.require('lib/views/user/editprofile.js');
+		$.require('lib/chaijs/user/editprofile.js');
 		if(!app.editprofileview)
 			app.editprofileview = new EditProfileView();
 		app.editprofileview.show();
@@ -1347,7 +1347,7 @@ chai.view = {
 		});
 	},
 	make_page: function(obj) {
-		$.require('lib/views/ui/page.js');
+		$.require('lib/chaijs/ui/page.js');
 		new PageView(obj);
 	},
 
@@ -1378,21 +1378,21 @@ $(window).bind('hashchange', function() {
 });
 
 app.views = {
-	'notfound': {path: 'lib/views/notfound.html'},
+	'notfound': {path: 'lib/chaijs/notfound.html'},
 	
 	// cms
-	'editpage': {path: 'lib/views/cms/editpage.html'},
-	'pagelist': {path: 'lib/views/cms/pagelist.html'},
-	'filelist': {path: 'lib/views/cms/filelist.html'},
-	'cms_settings': {path: 'lib/views/cms/settings.html'},
+	'editpage': {path: 'lib/chaijs/cms/editpage.html'},
+	'pagelist': {path: 'lib/chaijs/cms/pagelist.html'},
+	'filelist': {path: 'lib/chaijs/cms/filelist.html'},
+	'cms_settings': {path: 'lib/chaijs/cms/settings.html'},
 	
 	// user
-	'register': {path: 'lib/views/user/register.js'},
-	'userlist': {path: 'lib/views/user/userlist.html'},
-	'reset_password': {path: 'lib/views/user/reset_password.html'},
-	'reset_password_done': {path: 'lib/views/user/reset_password_done.html'},
-	'forgot_password': {path: 'lib/views/user/forgot_password.html'},
-	'forgot_password_done': {path: 'lib/views/user/forgot_password_done.html'}
+	'register': {path: 'lib/chaijs/user/register.js'},
+	'userlist': {path: 'lib/chaijs/user/userlist.html'},
+	'reset_password': {path: 'lib/chaijs/user/reset_password.html'},
+	'reset_password_done': {path: 'lib/chaijs/user/reset_password_done.html'},
+	'forgot_password': {path: 'lib/chaijs/user/forgot_password.html'},
+	'forgot_password_done': {path: 'lib/chaijs/user/forgot_password_done.html'}
 }
 
 var TopBar = Class.extend({
