@@ -2488,6 +2488,11 @@ section {
 
 textarea.code {
 	height: 20em;
+	font-family: "Courier", Fixed;
+}
+
+code {
+	background-color: transparent !important; 
 }
 
 .shadow {
@@ -2516,6 +2521,10 @@ textarea.code {
 	overflow: hidden;
 }
 
+.row {
+	margin-left: 0px !important;
+}
+
 .row > [class*="span"] {
   display: inline;
   float: left;
@@ -2525,12 +2534,9 @@ textarea.code {
 #main {
 	background-color: #fff;	
 	min-height: 500px;
-	border-right: 1px solid #ddd;
+	border-right: 1px solid #eee;
 }
 
-.sidebar {
-	padding: 20px;
-}
 .content-wrap {
 	padding: 20px;
 	display: none;
@@ -2556,6 +2562,29 @@ textarea.code {
 	margin-top: 6px;
 }
 
+/*
+sidebar
+- there will be only one active sidebar session at a time
+- all other sections if permanent, but be set a display: block
+*/
+#sidebar .sections {
+	padding: 20px;
+}
+
+.sidebar-section {
+	margin-bottom: 20px;
+	display: none;
+}
+
+.sidebar-section h5 {
+	line-height: 1em;
+	margin-bottom: 17px;
+}
+
+.sidebar-section.active {
+	display: block;
+}
+
 .item-box {
 	padding: 0px 11px;
 	margin-bottom: 11px;
@@ -2565,10 +2594,6 @@ textarea.code {
 
 .item-box-item {
 	padding-bottom: 7px;
-}
-
-code {
-	background-color: transparent !important; 
 }
 
 .notification {
@@ -2588,11 +2613,12 @@ form .clearfix:after {
 /* Footer
 -------------------------------------------------- */
 .footer {
-  min-width: 940px;
-  padding: 20px 0;
-*/}
-.footer p {
-  color: #555;
+	text-shadow: 0 1px 0 #FFFFFF;
+	color: #555;
+}
+.footer .container {
+	padding-left: 40px;
+	padding-bottom: 20px;
 }
 /*additional*/
 .sidebar-section {

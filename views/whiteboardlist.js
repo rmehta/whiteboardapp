@@ -56,7 +56,7 @@ var WhiteboardListView = Class.extend({
 	
 	delete_item: function(btn) {
 		$.call({
-			method:'lib.py.objstore.delete',
+			method:'lib.chai.objstore.delete',
 			type:'POST',
 			data: {type:"whiteboard", name: btn.wbname},
 			success: function(r) {

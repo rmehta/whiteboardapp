@@ -77,7 +77,7 @@ var WhiteboardController = Class.extend({
 	},
 	load_model: function() {
 		var me = this;
-		$('#whiteboard').bind('_show', function() {
+		$('#whiteboard').bind('page_show', function() {
 			me.load();
 		})
 	},

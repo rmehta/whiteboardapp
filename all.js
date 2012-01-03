@@ -1225,7 +1225,7 @@ var app = {
 				} else {
 					// active content is already loaded, 
 					// (for static content)
-					$content.trigger('_show');					
+					$content.trigger('page_show');					
 				}
 			} else {
 				// no location, open index
@@ -1244,7 +1244,9 @@ var app = {
 		})		
 	},
 	setup_cms: function() {
-		
+		if(app.cms_settings.footer) {
+			$('.footer .container').html(app.cms_settings.footer);
+		}
 	}
 };
 
@@ -1292,10 +1294,9 @@ chai.view = {
 
 		// go to home if not "index"
 		if(viewid=='index' && $.index!='index') {
-			chai.view.open($.index);
-			return;
+			viewid = $.index;
 		}
-		if(route==chai.view.current_route) {
+		if(route==chai.view.route) {
 			// no change
 			return;
 		}
@@ -1307,32 +1308,30 @@ chai.view = {
 	show: function(name, path) {
 		chai.view.load(name, path, function() {
 			// make page active
-			if($("#main .content-wrap.active").length) {
-				$("#main .content-wrap.active").removeClass('active');
+			var curpage = $("#main .content-wrap.active");
+			if(curpage.length) {
+				chai.view.pages[curpage.attr('id')].hide();
 			}
-			$("#"+name).addClass('active').trigger('_show');
+			app.cur_page = chai.view.pages[name];
+			app.cur_page.show();
+			
 			window.scroll(0, 0);
 		});
 	},
 	load: function(name, path, callback) {
-		if(!$('#'+name).length) {
+		if(chai.view.pages[name]) {
+			callback();
+		} else {
 			if(path) 
 				chai.view.load_files(name, path, callback);
 			else
-				chai.view.load_virtual(name, callback);
+				chai.view.load_virtual(name, callback);			
 		}
-		callback();
 	},
 	load_files: function(name, path, callback) {
-		var extn = path.split('.').splice(-1)[0];
-		if(extn=='js') {
-			$.getScript(path, callback);
-		} else {
-			$.get(path, function(html) {
-				chai.view.make_page({name:name, html:html});
-				callback();
-			});
-		}
+		$.get(path, function(html) {
+			chai.view.make_page({name:name, html:html}, callback);
+		});
 	},
 	load_virtual: function(name, callback) {
 		$.call({
@@ -1341,14 +1340,15 @@ chai.view = {
 				name: name,
 			},
 			success: function(data) {
-				chai.view.make_page({name:name, html:data.html, virtual:true});
-				callback();
+				data.virtual = true;
+				data.name = name;
+				chai.view.make_page(data, callback);
 			}
 		});
 	},
-	make_page: function(obj) {
-		$.require('lib/chaijs/ui/page.js');
-		new PageView(obj);
+	make_page: function(obj, callback) {
+		chai.view.pages[obj.name] = new PageView(obj);
+		callback();
 	},
 
 	// get view id from the given route
@@ -1366,7 +1366,7 @@ chai.view = {
 	is_same: function(name) {
 		if(name[0]!='#') name = '#' + name;
 		return name==location.hash;
-	},
+	}
 }
 
 // shortcut
@@ -1394,6 +1394,62 @@ app.views = {
 	'forgot_password': {path: 'lib/chaijs/user/forgot_password.html'},
 	'forgot_password_done': {path: 'lib/chaijs/user/forgot_password_done.html'}
 }
+
+/* ============================================================
+ * bootstrap-dropdown.js v1.4.0
+ * http://twitter.github.com/bootstrap/javascript.html#dropdown
+ * ============================================================
+ * Copyright 2011 Twitter, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ============================================================ */
+
+
+!function( $ ){
+
+  "use strict"
+
+  /* DROPDOWN PLUGIN DEFINITION
+   * ========================== */
+
+  $.fn.dropdown = function ( selector ) {
+    return this.each(function () {
+      $(this).delegate(selector || d, 'click', function (e) {
+        var li = $(this).parent('li')
+          , isActive = li.hasClass('open')
+
+        clearMenus()
+        !isActive && li.toggleClass('open')
+        return false
+      })
+    })
+  }
+
+  /* APPLY TO STANDARD DROPDOWN ELEMENTS
+   * =================================== */
+
+  var d = 'a.menu, .dropdown-toggle'
+
+  function clearMenus() {
+    $(d).parent('li').removeClass('open')
+  }
+
+  $(function () {
+    $('html').bind("click", clearMenus)
+    $('body').dropdown( '[data-dropdown] a.menu, [data-dropdown] .dropdown-toggle' )
+  })
+
+}( window.jQuery || window.ender );
 
 var TopBar = Class.extend({
 	init: function() {
@@ -1496,7 +1552,6 @@ var TopBar = Class.extend({
 
 // activate dropdown events
 $(document).ready(function() {
-	$.require('lib/js/bootstrap/bootstrap-dropdown.js');
 	app.topbar = new TopBar();
 
 	// set brand
@@ -1506,6 +1561,61 @@ $(document).ready(function() {
 
 
 
+var PageView = Class.extend({
+	init: function(obj) {
+		this.obj = obj;
+		this.make();
+	},
+	make: function() {
+		this.$body = $('<div>')
+			.addClass('content-wrap')
+			.attr('id', this.obj.name)
+			.appendTo('#main')		
+		this.make_sidebar();
+		
+		// html
+		this.$body.html(this.content());
+		
+		// js & css
+		if(this.obj.js) $.set_script(this.obj.js);
+		if(this.obj.css) $.set_style(this.obj.css);
+		
+		this.$body.trigger('page_make');
+	},
+	// if the layout has a #sidebar, make a .sidebar-section under .sections
+	// with id as #sidebar-(name)
+	// this div will be automatically shown / hidden with the page
+	make_sidebar: function() {
+		if($('#sidebar').length) {
+			$('#sidebar .sections').append($.rep('<div class="sidebar-section"\
+			 	id="sidebar-%(name)s"></div>', this.obj));
+			this.$sidebar = $('#sidebar-' + this.obj.name);
+		}
+	},
+	hide: function() {
+		this.$body.removeClass('active');
+		this.$sidebar && this.$sidebar.removeClass('active');
+		this.$body.trigger('page_hide');
+	},
+	show: function() {
+		this.$body.addClass('active');
+		this.$sidebar && this.$sidebar.addClass('active');
+		this.$body.trigger('page_show');
+	},
+	content: function() {		
+		return this.obj.html + this.footer();
+	},
+	footer: function() {
+		return this.editlink();
+	},
+	editlink: function() {
+		if(this.obj.virtual && $.session && $.session.user != 'guest') {
+			return $.rep('<p><a href="#editpage/%(name)s">Edit this page</a></p>', this.obj);
+		} else {
+			return '';
+		}
+	}
+});
 // register plugins
 app.views.whiteboard = {
 	path:'whiteboardapp/views/page_layout.html'
